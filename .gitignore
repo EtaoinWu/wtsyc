@@ -1,0 +1,6 @@
+.vscode/*
+
+build*/
+wtsyc
+*.lex.cpp
+*.parse.cpp
