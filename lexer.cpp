@@ -1,5 +1,5 @@
 
-#line 1 "lexer.rl"
+#line 1 "/home/etaoin/wtsyc/lexer.rl"
 // ragel_subtype=cpp
 
 #include <string>
@@ -11,16 +11,16 @@
 using namespace std;
 
 
-#line 18 "lexer.rl"
+#line 19 "/home/etaoin/wtsyc/lexer.rl"
 
 
 namespace {
 // Static, const tables of data.
 
-#line 21 "lexer.cpp"
+#line 21 "/home/etaoin/wtsyc/lexer.cpp"
 static const char _rule_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
-	3
+	3, 1, 4
 };
 
 static const char _rule_key_offsets[] = {
@@ -28,11 +28,11 @@ static const char _rule_key_offsets[] = {
 };
 
 static const char _rule_trans_keys[] = {
-	32, 61, 9, 13, 0
+	10, 32, 61, 9, 13, 0
 };
 
 static const char _rule_single_lengths[] = {
-	0, 2
+	0, 3
 };
 
 static const char _rule_range_lengths[] = {
@@ -44,11 +44,11 @@ static const char _rule_index_offsets[] = {
 };
 
 static const char _rule_trans_targs[] = {
-	1, 1, 1, 0, 0
+	1, 1, 1, 1, 0, 0
 };
 
 static const char _rule_trans_actions[] = {
-	5, 7, 5, 0, 0
+	5, 7, 9, 7, 0, 0
 };
 
 static const char _rule_to_state_actions[] = {
@@ -66,21 +66,21 @@ static const int rule_error = 0;
 static const int rule_en_main = 1;
 
 
-#line 23 "lexer.rl"
+#line 24 "/home/etaoin/wtsyc/lexer.rl"
 }
 
 namespace SysY {
 
-    Lexer::Lexer(string_view source) : source(source), p(source.begin()), pe(source.end()), eof(source.end()),
-        cs(rule_start), ts(source.begin()), te(source.begin()), act(0) {}
+  Lexer::Lexer(string_view source) : source(source), p(source.begin()), pe(source.end()), eof(source.end()),
+    cs(rule_start), ts(source.begin()), te(source.begin()), act(0) {}
 
-    Range Lexer::tokenRange() const {
-        return {ts - source.begin(), te - source.begin()};
-    }
+  Range Lexer::tokenRange() const {
+    return {ts - source.begin(), te - source.begin()};
+  }
 
-    SysY::Parser::symbol_type Lexer::exec() {
-        
-#line 84 "lexer.cpp"
+  SysY::Parser::symbol_type Lexer::exec() {
+    
+#line 84 "/home/etaoin/wtsyc/lexer.cpp"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -101,7 +101,7 @@ _resume:
 #line 1 "NONE"
 	{ts = p;}
 	break;
-#line 105 "lexer.cpp"
+#line 105 "/home/etaoin/wtsyc/lexer.cpp"
 		}
 	}
 
@@ -166,14 +166,18 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 2:
-#line 14 "lexer.rl"
-	{te = p+1;}
+#line 14 "/home/etaoin/wtsyc/lexer.rl"
+	{te = p+1;{ line_end(p); }}
 	break;
 	case 3:
-#line 16 "lexer.rl"
+#line 15 "/home/etaoin/wtsyc/lexer.rl"
+	{te = p+1;}
+	break;
+	case 4:
+#line 17 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_ASSIGN(tokenRange()); }}
 	break;
-#line 177 "lexer.cpp"
+#line 181 "/home/etaoin/wtsyc/lexer.cpp"
 		}
 	}
 
@@ -186,7 +190,7 @@ _again:
 #line 1 "NONE"
 	{ts = 0;}
 	break;
-#line 190 "lexer.cpp"
+#line 194 "/home/etaoin/wtsyc/lexer.cpp"
 		}
 	}
 
@@ -198,14 +202,17 @@ _again:
 	_out: {}
 	}
 
-#line 36 "lexer.rl"
-        return SysY::Parser::make_EOF(tokenRange());
-    }
+#line 37 "/home/etaoin/wtsyc/lexer.rl"
+    return SysY::Parser::make_EOF(tokenRange());
+  }
 
-    SysY::Parser::symbol_type Lexer::operator()() {
-        auto result = this->exec();
-        this->p++;
-        return result;
-    }
+  SysY::Parser::symbol_type Lexer::operator()() {
+    auto result = this->exec();
+    this->p++;
+    return result;
+  }
 
+  void SysY::Lexer::line_end(const std::string_view::const_iterator &it) {
+    lines.push_back(it - source.begin());
+  }
 }

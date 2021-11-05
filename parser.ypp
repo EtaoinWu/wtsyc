@@ -13,6 +13,7 @@
    #include <cstdlib>
    #include <string>
    #include <fstream>
+   #include <memory>
    #include "semantics.hpp"
    #include "location.hpp"
    
@@ -45,17 +46,6 @@
    SysY::Parser::symbol_type yylex(SysY::Driver &driver) {
       return driver.lexer();
    }
-
-   #define YYLLOC_DEFAULT(Current, Rhs, N)                              \
-    do {                                                                \
-      if (N) {                                                          \
-          (Current).start  = YYRHSLOC(Rhs, 1).start;                    \
-          (Current).end    = YYRHSLOC(Rhs, N).end;                      \
-      }                                                                 \
-      else {                                                            \
-          (Current).start = (Current).end = YYRHSLOC(Rhs, 0).end;       \
-      }                                                                 \
-   } while (false)
 }
 
 %define api.token.prefix {TOKEN_}
@@ -98,7 +88,11 @@
 
 %%
 %start result;
-result: "=" { this->driver.result = nullptr; }
+result: eq { this->driver.result = move($1); }
+
+%nterm <std::unique_ptr<SysY::ASTNode>> eq;
+eq: "=" { $$ = std::make_unique<ASTNode>(1); }
+   | eq "=" { $$ = move($1); $$->value ++; }
 %%
 
 

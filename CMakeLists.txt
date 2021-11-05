@@ -14,15 +14,23 @@ BISON_TARGET(parser
 
 FILE(GLOB CPP_SRC RELATIVE ${CMAKE_SOURCE_DIR} *.cpp)
 
-FILE(GLOB FMT_CPP_SRC RELATIVE ${CMAKE_SOURCE_DIR} fmt/src/*.cc)
+FILE(GLOB FMT_CPP_SRC RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/src/*.cc)
+
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl
+    COMMAND ragel ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl -o ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp || echo "ragel not found"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(wtsyc
     ${CPP_SRC}
     ${FMT_CPP_SRC}
+    ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
     ${BISON_parser_OUTPUTS}
 )
 
 target_include_directories(wtsyc
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_BINARY_DIR})
+        ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party)

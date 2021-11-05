@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string_view>
+#include <set>
 #include "parser.hpp"
 #include "location.hpp"
 
@@ -11,13 +12,23 @@ namespace SysY {
     std::string_view source;
 
     // Ragel states
+    // Pointer
     std::string_view::const_iterator p;
+    // Pointer End
     const std::string_view::const_iterator pe;
     const std::string_view::const_iterator eof;
+    // Current State
     int cs;
+    // Token Start
     std::string_view::const_iterator ts;
+    // Token End
     std::string_view::const_iterator te;
+    // Acti
     int act;
+
+    // Line tracing
+    std::vector<ptrdiff_t> lines;
+    void line_end(const std::string_view::const_iterator &it);
   public:
     Lexer(std::string_view source_);
     Range tokenRange() const;
