@@ -1,0 +1,110 @@
+%language "c++"
+%require  "3.3"
+%debug 
+%defines 
+
+%define api.namespace {SysY}
+%define api.parser.class {Parser}
+%define api.value.type variant
+%define api.token.constructor
+
+%code requires{
+   #include <iostream>
+   #include <cstdlib>
+   #include <string>
+   #include <fstream>
+   #include "semantics.hpp"
+   #include "location.hpp"
+   
+   namespace SysY {
+      class Driver;
+   }
+#ifndef YY_NULLPTR
+# if defined __cplusplus && 201103L <= __cplusplus
+#  define YY_NULLPTR nullptr
+# else
+#  define YY_NULLPTR 0
+# endif
+#endif
+}
+
+%param { SysY::Driver  &driver  }
+
+
+%define parse.assert
+%printer { yyo << ($$)->showRaw(); } <std::unique_ptr<SysY::ASTNode>>;
+%printer { yyo << $$; } <*>;
+
+%locations
+%define api.location.type {SysY::Range}
+
+
+%code{
+   /* include for all driver functions */
+   #include "driver.hpp"
+   SysY::Parser::symbol_type yylex(SysY::Driver &driver) {
+      return driver.lexer();
+   }
+
+   #define YYLLOC_DEFAULT(Current, Rhs, N)                              \
+    do {                                                                \
+      if (N) {                                                          \
+          (Current).start  = YYRHSLOC(Rhs, 1).start;                    \
+          (Current).end    = YYRHSLOC(Rhs, N).end;                      \
+      }                                                                 \
+      else {                                                            \
+          (Current).start = (Current).end = YYRHSLOC(Rhs, 0).end;       \
+      }                                                                 \
+   } while (false)
+}
+
+%define api.token.prefix {TOKEN_}
+
+%token               EOF 0
+%token               LBRACKET "["
+%token               RBRACKET "]"
+%token               LPAREN "("
+%token               RPAREN ")"
+%token               LCURLY "{"
+%token               RCURLY "}"
+%token               COMMA ","
+%token               PERIOD "."
+%token               SEMICOLON ";"
+%token               ASSIGN "="
+%token               PLUS "+"
+%token               MINUS "-"
+%token               STAR "*"
+%token               SLASH "/"
+%token               MOD "%"
+%token               GT ">"
+%token               GE ">="
+%token               LT "<"
+%token               LE "<="
+%token               EQ "=="
+%token               NEQ "!="
+%token               LOGICAL_NOT "!"
+%token               LOGICAL_AND "&&"
+%token               LOGICAL_OR "||"
+%token               IF "if"
+%token               ELSE "else"
+%token               WHILE "while"
+%token               BREAK "break"
+%token               CONTINUE "continue"
+%token               RETURN "return"
+%token               CONST "const"
+%token <int>         INT_LITERAL
+%token <SysY::Type>  TYPE
+%token <std::string> IDENT
+
+%%
+%start result;
+result: "=" { this->driver.result = nullptr; }
+%%
+
+
+void SysY::Parser::error( const SysY::Range &l, const std::string &err_message )
+{
+   std::cerr << "Error: " << err_message << " at " << l << "\n";
+}
+
+
