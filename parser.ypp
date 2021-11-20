@@ -33,7 +33,13 @@
 
 
 %define parse.assert
-%printer { yyo << ($$)->showRaw(); } <std::unique_ptr<SysY::ASTNode>>;
+%printer { yyo << ($$)->toString(); } 
+   <AST::pointer<AST::Node>>
+   <AST::pointer<AST::Expression>>
+   <AST::pointer<AST::Identifier>>
+   <AST::pointer<AST::LeftValueExpression>>
+   <AST::pointer<AST::FuncParams>>
+   ;
 %printer { yyo << $$; } <*>;
 
 %locations
@@ -50,49 +56,137 @@
 
 %define api.token.prefix {TOKEN_}
 
-%token               EOF 0
-%token               LBRACKET "["
-%token               RBRACKET "]"
-%token               LPAREN "("
-%token               RPAREN ")"
-%token               LCURLY "{"
-%token               RCURLY "}"
-%token               COMMA ","
-%token               PERIOD "."
-%token               SEMICOLON ";"
-%token               ASSIGN "="
-%token               PLUS "+"
-%token               MINUS "-"
-%token               STAR "*"
-%token               SLASH "/"
-%token               MOD "%"
-%token               GT ">"
-%token               GE ">="
-%token               LT "<"
-%token               LE "<="
-%token               EQ "=="
-%token               NEQ "!="
-%token               LOGICAL_NOT "!"
-%token               LOGICAL_AND "&&"
-%token               LOGICAL_OR "||"
-%token               IF "if"
-%token               ELSE "else"
-%token               WHILE "while"
-%token               BREAK "break"
-%token               CONTINUE "continue"
-%token               RETURN "return"
-%token               CONST "const"
-%token <int>         INT_LITERAL
-%token <SysY::Type>  TYPE
-%token <std::string> IDENT
+%token                         EOF 0
+%token                         LBRACKET "["
+%token                         RBRACKET "]"
+%token                         LPAREN "("
+%token                         RPAREN ")"
+%token                         LCURLY "{"
+%token                         RCURLY "}"
+%token                         COMMA ","
+%token                         PERIOD "."
+%token                         SEMICOLON ";"
+%token                         ASSIGN "="
+%token                         PLUS "+"
+%token                         MINUS "-"
+%token                         STAR "*"
+%token                         SLASH "/"
+%token                         MOD "%"
+%token                         GT ">"
+%token                         GE ">="
+%token                         LT "<"
+%token                         LE "<="
+%token                         EQ "=="
+%token                         NEQ "!="
+%token                         LOGICAL_NOT "!"
+%token                         LOGICAL_AND "&&"
+%token                         LOGICAL_OR "||"
+%token                         IF "if"
+%token                         ELSE "else"
+%token                         WHILE "while"
+%token                         BREAK "break"
+%token                         CONTINUE "continue"
+%token                         RETURN "return"
+%token                         CONST "const"
+%token <int>                   INT_LITERAL
+%token <SysY::PrimitiveType>   TYPE
+%token <std::string>           IDENT
 
 %%
 %start result;
-result: eq { this->driver.result = move($1); }
+result: comp_unit;
 
-%nterm <std::unique_ptr<SysY::ASTNode>> eq;
-eq: "=" { $$ = std::make_unique<ASTNode>(1); }
-   | eq "=" { $$ = move($1); $$->value ++; }
+comp_unit: /* epsilon */
+   | comp_unit declaration
+
+declaration:
+   const_declaration
+
+const_declaration:
+   "const" TYPE const_definition_list ";"
+
+const_definition_list:
+   const_definition | const_definition_list "," const_definition
+
+const_definition:
+   IDENT
+
+%nterm <AST::pointer<AST::Identifier>> identifier;
+identifier : IDENT { $$ = std::make_unique<AST::Identifier>($1); }
+
+/* expressions */
+
+%nterm <AST::pointer<AST::Expression>> expr;
+expr: add_expr { $$ = move($1); }
+
+%nterm <AST::pointer<AST::LeftValueExpression>> left_val;
+left_val: 
+   identifier { $$ = move($1); }
+   | left_val "[" expr "]" { $$ = std::make_unique<AST::OffsetExpression>(move($1), move($3)); }
+
+%nterm <AST::pointer<AST::Expression>> primary_expr;
+primary_expr: 
+   "(" expr ")" { $$ = move($2); }
+   | left_val { $$ = move($1); }
+   | INT_LITERAL { $$ = std::make_unique<AST::LiteralExpression>($1); }
+
+%nterm <AST::pointer<AST::Expression>> unary_expr;
+unary_expr:
+   primary_expr { $$ = move($1); }
+   | identifier "(" ")" { $$ = std::make_unique<AST::CallExpression>(move($1), AST::FuncParams{}); }
+   | identifier "(" func_params ")" { $$ = std::make_unique<AST::CallExpression>(move($1), std::move(*($3))); }
+   | unary_op unary_expr { $$ = std::make_unique<AST::UnaryExpression>($1, move($2)); }
+
+%nterm <AST::pointer<AST::Expression>> mul_expr;
+mul_expr:
+   unary_expr { $$ = move($1); }
+   | mul_expr "*" unary_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Mult, move($1), move($3)); }
+   | mul_expr "/" unary_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Div, move($1), move($3)); }
+   | mul_expr "%" unary_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Mod, move($1), move($3)); }
+   
+%nterm <AST::pointer<AST::Expression>> add_expr;
+add_expr :
+   mul_expr { $$ = move($1); }
+   | add_expr "+" mul_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Plus, move($1), move($3)); }
+   | add_expr "-" mul_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Minus, move($1), move($3)); }
+
+%nterm <AST::pointer<AST::Expression>> rel_expr;
+rel_expr:
+   add_expr { $$ = move($1); } 
+   | rel_expr "<" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::LT, move($1), move($3)); }
+   | rel_expr ">" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::GT, move($1), move($3)); }
+   | rel_expr "<=" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::LE, move($1), move($3)); }
+   | rel_expr ">=" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::GE, move($1), move($3)); }
+
+%nterm <AST::pointer<AST::Expression>> eq_expr;
+eq_expr:
+   rel_expr { $$ = move($1); } 
+   | eq_expr "==" rel_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::EQ, move($1), move($3)); }
+   | eq_expr "!=" rel_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::NE, move($1), move($3)); }
+
+%nterm <AST::pointer<AST::Expression>> and_expr;
+and_expr:
+   eq_expr { $$ = move($1); } 
+   | and_expr "&&" eq_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::And, move($1), move($3)); }
+
+%nterm <AST::pointer<AST::Expression>> or_expr;
+or_expr:
+   and_expr { $$ = move($1); } 
+   | or_expr "||" and_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Or, move($1), move($3)); }
+
+%nterm <AST::pointer<AST::Expression>> const_expr;
+const_expr : add_expr { $$ = move($1); }
+   
+%nterm <AST::UnaryOp> unary_op;
+unary_op:
+   "+" { $$ = AST::UnaryOp::Plus; }
+   | "-" { $$ = AST::UnaryOp::Minus; }
+   | "!" { $$ = AST::UnaryOp::Not; }
+
+%nterm <AST::pointer<AST::FuncParams>> func_params;
+func_params:
+   expr { $$ = std::make_unique<AST::FuncParams>(); $$->params.emplace_back(move($1)); }
+   | func_params "," expr { $$ = std::move($1); $$->params.emplace_back(move($3)); }
 %%
 
 

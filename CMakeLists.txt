@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wno-register)
 
 find_package(BISON REQUIRED)
-find_package(FLEX REQUIRED)
 
 BISON_TARGET(parser
              parser.ypp

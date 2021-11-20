@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   std::stringstream ibuf;
   ibuf << ifile.rdbuf();
   auto res = SysY::parse(ibuf.str(), program.get<bool>("--trace"));
-  std::cout << res->value << std::endl;
+  std::cout << res->toString() << std::endl;
 
   return 0;
 }

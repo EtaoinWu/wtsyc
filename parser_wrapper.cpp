@@ -1,7 +1,7 @@
 #include "parser_wrapper.hpp"
 
 namespace SysY {
-  std::unique_ptr<ASTNode> parse(std::string_view source, bool trace) {
+  std::unique_ptr<AST::CompUnit> parse(std::string_view source, bool trace) {
     Driver driver(source);
     Parser parser(driver);
 
@@ -15,6 +15,6 @@ namespace SysY {
       return nullptr;
     }
 
-    return move(driver.result);
+    return std::move(driver.unit);
   }
 }

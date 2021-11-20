@@ -1,0 +1,9 @@
+﻿---
+BasedOnStyle: LLVM
+NamespaceIndentation: All
+Standard: Cpp11
+TabWidth: '2'
+UseTab: Never
+IndentCaseLabels: false
+
+...
