@@ -1,0 +1,3 @@
+[submodule "3rd-party/sysy-runtime"]
+	path = 3rd-party/sysy-runtime
+	url = https://github.com/pku-minic/sysy-runtime-lib/

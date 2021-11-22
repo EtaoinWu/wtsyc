@@ -4,7 +4,6 @@
 #include <vector>
 #include <type_traits>
 #include <optional>
-#include "fmt/format.h"
 #include "json/json.hpp"
 
 namespace SysY {
@@ -56,26 +55,13 @@ namespace SysY {
       public:
         std::string name;
         Identifier(std::string_view name_) : name{name_} {}
-        std::string toString() const override {
-          return fmt::format("Identifier {}", name);
-        }
+        std::string toString() const override;
         json toJSON() const override { return name; }
       };
 
       enum class UnaryOp { Plus, Minus, Not };
 
-      inline std::string toString(UnaryOp t) {
-        switch (t) {
-        case UnaryOp::Plus:
-          return "+";
-        case UnaryOp::Minus:
-          return "-";
-        case UnaryOp::Not:
-          return "!";
-        default:
-          return "";
-        }
-      }
+      std::string toString(UnaryOp t);
 
       enum class BinaryOp {
         Plus,
@@ -93,47 +79,14 @@ namespace SysY {
         Or
       };
 
-      inline std::string toString(BinaryOp t) {
-        switch (t) {
-        case BinaryOp::Plus:
-          return "+";
-        case BinaryOp::Minus:
-          return "-";
-        case BinaryOp::Mult:
-          return "*";
-        case BinaryOp::Div:
-          return "/";
-        case BinaryOp::Mod:
-          return "%";
-        case BinaryOp::LT:
-          return "<";
-        case BinaryOp::GT:
-          return ">";
-        case BinaryOp::LE:
-          return "<=";
-        case BinaryOp::GE:
-          return ">=";
-        case BinaryOp::NE:
-          return "!=";
-        case BinaryOp::EQ:
-          return "==";
-        case BinaryOp::And:
-          return "&&";
-        case BinaryOp::Or:
-          return "||";
-        default:
-          return "";
-        }
-      }
+      std::string toString(BinaryOp t);
 
       class LiteralExpression : public Expression {
       public:
         literal_type val;
         LiteralExpression(literal_type val_) : val{val_} {}
-        std::string toString() const override {
-          return fmt::format("LiteralExpression ({})", val);
-        }
-        json toJSON() const override { return val; }
+        std::string toString() const override;
+        json toJSON() const override;
       };
 
       class UnaryExpression : public Expression {
@@ -142,15 +95,10 @@ namespace SysY {
         pointer<Expression> ch;
         UnaryExpression(UnaryOp op_, pointer<Expression> ch_)
             : op{op_}, ch{std::move(ch_)} {}
-        std::string toString() const override {
-          return fmt::format("UnaryExpression {} ({})",
-                             AST::Expressions::toString(op), ch->toString());
-        }
-        json toJSON() const override {
-          return {{"type", "unary"},
-                  {"op", AST::Expressions::toString(op)},
-                  {"ch", ch->toJSON()}};
-        }
+
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class BinaryExpression : public Expression {
@@ -161,17 +109,10 @@ namespace SysY {
         BinaryExpression(BinaryOp op_, pointer<Expression> ch0_,
                          pointer<Expression> ch1_)
             : op{op_}, ch0{std::move(ch0_)}, ch1{std::move(ch1_)} {}
-        std::string toString() const override {
-          return fmt::format("BinaryExpression {} ({}, {})",
-                             AST::Expressions::toString(op), ch0->toString(),
-                             ch1->toString());
-        }
-        json toJSON() const override {
-          return {{"type", "binary"},
-                  {"op", AST::Expressions::toString(op)},
-                  {"ch0", ch0->toJSON()},
-                  {"ch1", ch1->toJSON()}};
-        }
+
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class OffsetExpression : public LeftValueExpression {
@@ -181,15 +122,10 @@ namespace SysY {
         OffsetExpression(pointer<LeftValueExpression> arr_,
                          pointer<Expression> offset_)
             : arr{std::move(arr_)}, offset{std::move(offset_)} {}
-        std::string toString() const override {
-          return fmt::format("OffsetExpression ({}, {})", arr->toString(),
-                             offset->toString());
-        }
-        json toJSON() const override {
-          return {{"type", "offset"},
-                  {"arr", arr->toJSON()},
-                  {"offset", offset->toJSON()}};
-        }
+
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class FuncParams : public Node {
@@ -201,10 +137,8 @@ namespace SysY {
         FuncParams(const FuncParams &) = delete;
         FuncParams(FuncParams &&) = default;
         FuncParams &operator=(const FuncParams &) = delete;
-        std::string toString() const override {
-          return fmt::format("({})", fmt::join(params, ", "));
-        }
-        json toJSON() const override { return AST::toJSON(params); }
+        std::string toString() const override;
+        json toJSON() const override;
       };
 
       class CallExpression : public Expression {
@@ -213,15 +147,10 @@ namespace SysY {
         FuncParams args;
         CallExpression(pointer<Identifier> func_, FuncParams args_)
             : func{std::move(func_)}, args{std::move(args_)} {}
-        std::string toString() const override {
-          return fmt::format("CallExpression {} {}", func->toString(),
-                             args.toString());
-        }
-        json toJSON() const override {
-          return {{"type", "call"},
-                  {"func", func->toJSON()},
-                  {"args", args.toJSON()}};
-        }
+
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
     } // namespace Expressions
     using namespace Expressions;
@@ -236,10 +165,8 @@ namespace SysY {
         OffsetList(const OffsetList &) = delete;
         OffsetList(OffsetList &&) = default;
         OffsetList &operator=(const OffsetList &) = delete;
-        std::string toString() const override {
-          return fmt::format("[{}]", fmt::join(offsets, "]["));
-        }
-        json toJSON() const override { return AST::toJSON(offsets); }
+        std::string toString() const override;
+        json toJSON() const override;
       };
 
       class SemanticType {
@@ -282,43 +209,25 @@ namespace SysY {
       class ConstDeclaration : public CompileTimeDeclaration {
       public:
         using CompileTimeDeclaration::CompileTimeDeclaration;
-        std::string toString() const override {
-          return fmt::format("ConstDeclaration {} {} = {}", name,
-                             offset_list.toString(), init_value->toString());
-        }
-        json toJSON() const override {
-          return {{"type", "const_dec"},
-                  {"name", name},
-                  {"type", offset_list.toJSON()},
-                  {"init", init_value->toJSON()}};
-        }
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class VariableDeclaration : public CompileTimeDeclaration {
       public:
         using CompileTimeDeclaration::CompileTimeDeclaration;
-        std::string toString() const override {
-          return fmt::format("VariableDeclaration {} {} = {}", name,
-                             offset_list.toString(), init_value->toString());
-        }
-        json toJSON() const override {
-          return {{"type", "var_dec"},
-                  {"name", name},
-                  {"type", offset_list.toJSON()},
-                  {"init", init_value->toJSON()}};
-        }
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class ParamDeclaration : public CompileTimeDeclaration {
       public:
         using CompileTimeDeclaration::CompileTimeDeclaration;
-        std::string toString() const override {
-          return fmt::format("ParamDeclaration {} {}", name,
-                             offset_list.toString());
-        }
-        json toJSON() const override {
-          return {{"name", name}, {"type", offset_list.toJSON()}};
-        }
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
     } // namespace Declarations
     using namespace Declarations;
@@ -329,14 +238,14 @@ namespace SysY {
       class BreakStmt : public Statement {
       public:
         BreakStmt() = default;
-        std::string toString() const override { return "break"; }
-        json toJSON() const override { return "break"; }
+        std::string toString() const override;
+        json toJSON() const override;
       };
       class ContinueStmt : public Statement {
       public:
         ContinueStmt() = default;
-        std::string toString() const override { return "continue"; }
-        json toJSON() const override { return "continue"; }
+        std::string toString() const override;
+        json toJSON() const override;
       };
 
       class Block : public Statement {
@@ -344,10 +253,8 @@ namespace SysY {
         container<pointer<BlockItem>> code;
         Block() = default;
         Block(Block &&) = default;
-        std::string toString() const override {
-          return fmt::format("{{{}}}", fmt::join(code, "; "));
-        }
-        json toJSON() const override { return AST::toJSON(code); }
+        std::string toString() const override;
+        json toJSON() const override;
       };
 
       class AssignmentStmt : public Statement {
@@ -358,15 +265,10 @@ namespace SysY {
         AssignmentStmt(pointer<LeftValueExpression> lhs_,
                        pointer<Expression> rhs_)
             : lhs{std::move(lhs_)}, rhs{std::move(rhs_)} {}
-        std::string toString() const override {
-          return fmt::format("Assignment {} = {}", lhs->toString(),
-                             rhs->toString());
-        }
-        json toJSON() const override {
-          return {{"stmt", "assignment"},
-                  {"lhs", lhs->toJSON()},
-                  {"rhs", rhs->toJSON()}};
-        }
+
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class ExpressionStmt : public Statement {
@@ -374,12 +276,9 @@ namespace SysY {
         pointer<Expression> rhs;
 
         ExpressionStmt(pointer<Expression> rhs_) : rhs{std::move(rhs_)} {}
-        std::string toString() const override {
-          return fmt::format("ExprStmt {}", rhs->toString());
-        }
-        json toJSON() const override {
-          return {{"stmt", "expr"}, {"rhs", rhs->toJSON()}};
-        }
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class ReturnStmt : public Statement {
@@ -388,18 +287,8 @@ namespace SysY {
 
         ReturnStmt() : rhs{std::nullopt} {}
         ReturnStmt(pointer<Expression> rhs_) : rhs{std::move(rhs_)} {}
-        std::string toString() const override {
-          if (rhs.has_value()) {
-            return fmt::format("Return {}", rhs.value()->toString());
-          } else {
-            return "Return;";
-          }
-        }
-        json toJSON() const override {
-          return {{"stmt", "return"},
-                  {"return",
-                   rhs.has_value() ? rhs.value()->toJSON() : json(nullptr)}};
-        }
+        std::string toString() const override;
+        json toJSON() const override;
       };
 
       class IfStmt : public Statement {
@@ -417,22 +306,9 @@ namespace SysY {
             : cond{move(cond_)}, then_clause{move(then_clause_)},
               else_clause{std::nullopt} {}
 
-        std::string toString() const override {
-          return else_clause.has_value()
-                     ? fmt::format("If {} Then {} Else {}", cond->toString(),
-                                   then_clause->toString(),
-                                   else_clause.value()->toString())
-                     : fmt::format("If {} Then {}", cond->toString(),
-                                   then_clause->toString());
-        }
-        json toJSON() const override {
-          return {{"stmt", "if"},
-                  {"if", cond->toJSON()},
-                  {"then", then_clause->toJSON()},
-                  {"else", else_clause.has_value()
-                               ? else_clause.value()->toJSON()
-                               : json(nullptr)}};
-        }
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
 
       class WhileStmt : public Statement {
@@ -443,15 +319,9 @@ namespace SysY {
         WhileStmt(pointer<Expression> cond_, pointer<Statement> body_)
             : cond{move(cond_)}, body{move(body_)} {}
 
-        std::string toString() const override {
-          return fmt::format("While {} Do {}", cond->toString(),
-                             body->toString());
-        }
-        json toJSON() const override {
-          return {{"stmt", "while"},
-                  {"while", cond->toJSON()},
-                  {"do", body->toJSON()}};
-        }
+        std::string toString() const override;
+
+        json toJSON() const override;
       };
     } // namespace Statements
     using namespace Statements;
@@ -469,32 +339,19 @@ namespace SysY {
       Function(PrimitiveType ret_, const std::string &name_,
                decltype(code) code_)
           : ret{ret_}, name{name_}, params{}, code{move(code_)} {}
-      std::string toString() const override {
-        return fmt::format("Function {} {} ({}) {{{}}}", SysY::toString(ret),
-                           name, fmt::join(params, ", "), code->toString());
-      }
-      json toJSON() const override {
-        return {{"return", SysY::toString(ret)},
-                {"name", name},
-                {"params", AST::toJSON(params)},
-                {"code", code->toJSON()}};
-      }
+
+      std::string toString() const override;
+
+      json toJSON() const override;
     };
 
     class CompUnit : public Node {
     public:
       container<pointer<CompileTimeDeclaration>> globals;
       container<pointer<Function>> functions;
-      std::string toString() const override {
-        return fmt::format("CompUnit\nwith declaration: {}\nwith functions: {}",
-                           fmt::join(globals, "\n"),
-                           fmt::join(functions, "\n"));
-      }
-      json toJSON() const override {
-        return {{"type", "comp unit"},
-                {"globals", AST::toJSON(globals)},
-                {"functions", AST::toJSON(functions)}};
-      }
+      std::string toString() const override;
+
+      json toJSON() const override;
     };
 
     class ArrayLiteral : public PotentialLiteral {
@@ -502,10 +359,8 @@ namespace SysY {
       container<pointer<PotentialLiteral>> data;
       ArrayLiteral() = default;
       ArrayLiteral(ArrayLiteral &&) = default;
-      std::string toString() const override {
-        return fmt::format("ArrayLiteral [{}]", fmt::join(data, ", "));
-      }
-      json toJSON() const override { return AST::toJSON(data); }
+      std::string toString() const override;
+      json toJSON() const override;
     };
   } // namespace AST
 
@@ -528,12 +383,3 @@ inline std::ostream &operator<<(std::ostream &os, T t) {
 inline std::ostream &operator<<(std::ostream &os, SysY::PrimitiveType t) {
   return os << SysY::toString(t);
 }
-
-template <typename T>
-struct fmt::formatter<SysY::AST::pointer<T>> : formatter<string_view> {
-  // parse is inherited from formatter<string_view>.
-  template <typename FormatContext>
-  auto format(const SysY::AST::pointer<T> &c, FormatContext &ctx) {
-    return formatter<string_view>::format(c->toString(), ctx);
-  }
-};
