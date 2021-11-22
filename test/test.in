@@ -1,1 +1,6 @@
-+114514 + i >= 1919810 - j || 
+int main(int f[][3]) {
+  int x;
+  read(x);
+  print(x);
+  return 0;
+}

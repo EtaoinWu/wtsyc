@@ -48,10 +48,10 @@ using namespace std;
     "continue"  => { return SysY::Parser::make_CONTINUE(tokenRange()); };
     "return"    => { return SysY::Parser::make_RETURN(tokenRange()); };
     "const"     => { return SysY::Parser::make_CONST(tokenRange()); };
-    "int"       => { return SysY::Parser::make_TYPE(Type::INT, tokenRange()); };
-    "void"      => { return SysY::Parser::make_TYPE(Type::VOID, tokenRange()); };
+    "int"       => { return SysY::Parser::make_TYPE(PrimitiveType::INT, tokenRange()); };
+    "void"      => { return SysY::Parser::make_TYPE(PrimitiveType::VOID, tokenRange()); };
 
-    (('0' . [0-7]+) | (("0x" | "0X") xdigit+) | ([1-9] digit+) | "0")
+    (('0' . [0-7]+) | (("0x" | "0X") xdigit+) | ([1-9] digit*) | "0")
       => { return make_INT_LITERAL(std::string(ts, te - ts), tokenRange()); };
 
     (alpha | "_") (alnum | "_") *

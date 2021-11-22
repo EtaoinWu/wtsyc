@@ -33,12 +33,29 @@
 
 
 %define parse.assert
-%printer { yyo << ($$)->toString(); } 
-   <AST::pointer<AST::Node>>
+%printer { yyo << ($$)->toJSON(); } 
+   /* <AST::pointer<AST::Node>> */
    <AST::pointer<AST::Expression>>
+   <AST::pointer<AST::PotentialLiteral>>
+   <AST::pointer<AST::ParamDeclaration>>
+   <AST::pointer<AST::VariableDeclaration>>
+   <AST::pointer<AST::ConstDeclaration>>
+   <AST::pointer<AST::ArrayLiteral>>
    <AST::pointer<AST::Identifier>>
    <AST::pointer<AST::LeftValueExpression>>
    <AST::pointer<AST::FuncParams>>
+   <AST::pointer<AST::OffsetList>>
+   <AST::pointer<AST::Block>>
+   <AST::pointer<AST::Function>>
+   /* <AST::pointer<AST::BlockItem>> */
+   <AST::pointer<AST::Statement>>
+   ;
+%printer { yyo << AST::toJSON($$); } 
+   /* <AST::pointer<AST::Node>> */
+   <AST::container<AST::pointer<AST::ParamDeclaration>>>
+   <AST::container<AST::pointer<AST::VariableDeclaration>>>
+   <AST::container<AST::pointer<AST::ConstDeclaration>>>
+   <AST::container<AST::pointer<AST::CompileTimeDeclaration>>>
    ;
 %printer { yyo << $$; } <*>;
 
@@ -92,29 +109,122 @@
 %token <SysY::PrimitiveType>   TYPE
 %token <std::string>           IDENT
 
+/* to solve dangling else */
+%nonassoc RPAREN
+%nonassoc ELSE
+
 %%
 %start result;
 result: comp_unit;
 
 comp_unit: /* epsilon */
-   | comp_unit declaration
+   | comp_unit declaration 
+   {
+      for (auto &ptr : $2) {
+         this->driver.unit->globals.emplace_back(std::move(ptr));
+      }
+   }
+   | comp_unit function_definition
+   {
+      this->driver.unit->functions.emplace_back(std::move($2));
+   }
 
+
+%nterm <AST::pointer<AST::ParamDeclaration>> function_param;
+function_param:
+   TYPE IDENT offset_list { $$ = std::make_unique<AST::ParamDeclaration>($2, std::move(*$3), std::make_unique<AST::NoneLiteral>()); }
+
+%nterm <AST::container<AST::pointer<AST::ParamDeclaration>>> function_params;
+function_params:
+   function_param { $$ = AST::container<AST::pointer<AST::ParamDeclaration>>(); $$.emplace_back(move($1)); }
+   | function_params "," function_param { $$ = std::move($1); $$.emplace_back(move($3)); }
+
+%nterm <AST::pointer<AST::Function>> function_definition;
+function_definition:
+   TYPE IDENT "(" ")" "{" block "}" { $$ = std::make_unique<AST::Function>($1, $2, move($6)); }
+   | TYPE IDENT "(" function_params ")" "{" block "}" { $$ = std::make_unique<AST::Function>($1, $2, std::move($4), move($7)); }
+
+////////////////////////////////////////////////////////////////
+/// Declarations ///////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+%nterm <AST::container<AST::pointer<AST::CompileTimeDeclaration>>> declaration;
 declaration:
-   const_declaration
+   const_declaration { std::move($1.begin(), $1.end(), std::back_inserter($$)); }
+   | var_declaration { std::move($1.begin(), $1.end(), std::back_inserter($$)); }
 
+%nterm <AST::container<AST::pointer<AST::ConstDeclaration>>> const_declaration;
 const_declaration:
-   "const" TYPE const_definition_list ";"
+   "const" TYPE const_definition_list ";" { $$ = std::move($3); }
 
+%nterm <AST::container<AST::pointer<AST::ConstDeclaration>>> const_definition_list;
 const_definition_list:
-   const_definition | const_definition_list "," const_definition
+   const_definition { $$ = AST::container<AST::pointer<AST::ConstDeclaration>>{}; $$.emplace_back(move($1)); }
+   | const_definition_list "," const_definition {$$ = std::move($1); $$.emplace_back(move($3)); }
 
+%nterm <AST::pointer<AST::ConstDeclaration>> const_definition;
 const_definition:
-   IDENT
+   IDENT offset_list "=" init_val
+   { $$ = std::make_unique<AST::ConstDeclaration>($1, std::move(*$2), move($4)); }
+
+%nterm <AST::container<AST::pointer<AST::VariableDeclaration>>> var_declaration;
+var_declaration:
+   TYPE var_definition_list ";" { $$ = std::move($2); }
+
+%nterm <AST::container<AST::pointer<AST::VariableDeclaration>>> var_definition_list;
+var_definition_list:
+   var_definition { $$ = AST::container<AST::pointer<AST::VariableDeclaration>>{}; $$.emplace_back(move($1)); }
+   | var_definition_list "," var_definition {$$ = std::move($1); $$.emplace_back(move($3)); }
+
+%nterm <AST::pointer<AST::VariableDeclaration>> var_definition;
+var_definition:
+   IDENT offset_list "=" init_val { $$ = std::make_unique<AST::VariableDeclaration>($1, std::move(*$2), move($4)); }
+   | IDENT offset_list { $$ = std::make_unique<AST::VariableDeclaration>($1, std::move(*$2), std::make_unique<AST::NoneLiteral>()); }
+
+
+////////////////////////////////////////////////////////////////
+/// Statements /////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+%nterm <AST::pointer<AST::Block>> block;
+block: 
+   /* epsilon */ { $$ = std::make_unique<AST::Block>(); }
+   | block statement { $$ = move($1); $$->code.emplace_back(move($2)); }
+   | block declaration { $$ = move($1); std::move($2.begin(), $2.end(), std::back_inserter($$->code)); }
+   | block ";" { $$ = move($1); }
+
+%nterm <AST::pointer<AST::Statement>> statement;
+statement:
+   left_val "=" expr ";" { $$ = std::make_unique<AST::AssignmentStmt>(move($1), move($3)); }
+   | expr ";" { $$ = std::make_unique<AST::ExpressionStmt>(move($1)); }
+   | "{" block "}" { $$ = move($2); }
+   | "if" "(" or_expr ")" statement "else" statement
+                                    { $$ = std::make_unique<AST::IfStmt>(move($3), move($5), move($7)); }
+   | "if" "(" or_expr ")" statement { $$ = std::make_unique<AST::IfStmt>(move($3), move($5)); }
+   | "while" "(" or_expr ")" statement { $$ = std::make_unique<AST::WhileStmt>(move($3), move($5)); }
+   | "break" ";" { $$ = std::make_unique<AST::BreakStmt>(); }
+   | "continue" ";" { $$ = std::make_unique<AST::BreakStmt>(); }
+   | "return" ";" { $$ = std::make_unique<AST::ReturnStmt>(); }
+   | "return" expr ";" { $$ = std::make_unique<AST::ReturnStmt>(move($2)); }
+
+%nterm <AST::pointer<AST::PotentialLiteral>> init_val;
+init_val:
+   expr { $$ = move($1); }
+   | "{" "}" { $$ = std::make_unique<AST::ArrayLiteral>(); }
+   | "{" init_array "}" { $$ = move($2); }
+
+
+%nterm <AST::pointer<AST::ArrayLiteral>> init_array;
+init_array:
+   init_val { $$ = std::make_unique<AST::ArrayLiteral>(); $$->data.emplace_back(move($1)); }
+   | init_array "," init_val { $$ = move($1); $$->data.emplace_back(move($3)); }
 
 %nterm <AST::pointer<AST::Identifier>> identifier;
 identifier : IDENT { $$ = std::make_unique<AST::Identifier>($1); }
 
-/* expressions */
+////////////////////////////////////////////////////////////////
+/// Expressions ////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
 
 %nterm <AST::pointer<AST::Expression>> expr;
 expr: add_expr { $$ = move($1); }
@@ -174,19 +284,33 @@ or_expr:
    and_expr { $$ = move($1); } 
    | or_expr "||" and_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Or, move($1), move($3)); }
 
-%nterm <AST::pointer<AST::Expression>> const_expr;
-const_expr : add_expr { $$ = move($1); }
-   
 %nterm <AST::UnaryOp> unary_op;
 unary_op:
    "+" { $$ = AST::UnaryOp::Plus; }
    | "-" { $$ = AST::UnaryOp::Minus; }
    | "!" { $$ = AST::UnaryOp::Not; }
 
+////////////////////////////////////////////////////////////////
+/// Utility ////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
 %nterm <AST::pointer<AST::FuncParams>> func_params;
 func_params:
    expr { $$ = std::make_unique<AST::FuncParams>(); $$->params.emplace_back(move($1)); }
    | func_params "," expr { $$ = std::move($1); $$->params.emplace_back(move($3)); }
+
+%nterm <AST::pointer<AST::OffsetList>> offset_list;
+offset_list:
+   /* epsilon */ { $$ = std::make_unique<AST::OffsetList>(); }
+   | "[" "]" { $$ = std::make_unique<AST::OffsetList>(); $$->offsets.emplace_back(std::make_unique<AST::NoneLiteral>()); }
+   | offset_list_body { $$ = std::move($1); }
+   | "[" "]" offset_list_body { $$ = std::make_unique<AST::OffsetList>(); $$->offsets.emplace_back(std::make_unique<AST::NoneLiteral>());
+      std::move($3->offsets.begin(), $3->offsets.end(), std::back_inserter($$->offsets)); }
+
+%nterm <AST::pointer<AST::OffsetList>> offset_list_body;
+offset_list_body:
+   "[" expr "]" { $$ = std::make_unique<AST::OffsetList>(); $$->offsets.emplace_back(move($2)); }
+   | offset_list_body "[" expr "]" { $$ = std::move($1); $$->offsets.emplace_back(move($3)); }
 %%
 
 
