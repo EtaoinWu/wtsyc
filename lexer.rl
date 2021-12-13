@@ -13,9 +13,14 @@ using namespace std;
 
 %%{
   machine rule;
+  action line_count {
+    line_end(p);
+  }
   main := |*
-    "\n"    => { line_end(p); };
+    "\n"    => line_count;
     space;
+    "/*" ( any | "\n" @line_count )* :>> "*/";
+    "//" any * "\n" @line_count;
     
     "["         => { return SysY::Parser::make_LBRACKET(tokenRange()); };
     "]"         => { return SysY::Parser::make_RBRACKET(tokenRange()); };
@@ -69,8 +74,8 @@ namespace SysY {
     errno = 0;
     long n = strtol (val.c_str(), NULL, 0);
     if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
-      throw SysY::Parser::syntax_error(r, "integer is out of range: " + val);
-    return SysY::Parser::make_INT_LITERAL(static_cast<int>(n), r);
+      throw Parser::syntax_error(r, "integer is out of range: " + val);
+    return Parser::make_INT_LITERAL(static_cast<int>(n), r);
   }
 
   Lexer::Lexer(string_view source) : source(source), p(source.begin()), pe(source.end()), eof(source.end()),
@@ -80,18 +85,23 @@ namespace SysY {
     return {ts - source.begin(), te - source.begin()};
   }
 
-  SysY::Parser::symbol_type Lexer::exec() {
+  Parser::symbol_type Lexer::exec() {
     %% write exec;
-    return SysY::Parser::make_EOF(tokenRange());
+    return Parser::make_EOF(tokenRange());
   }
 
-  SysY::Parser::symbol_type Lexer::operator()() {
+  Parser::symbol_type Lexer::operator()() {
     auto result = this->exec();
     this->p++;
     return result;
   }
 
-  void SysY::Lexer::line_end(const std::string_view::const_iterator &it) {
-    lines.push_back(it - source.begin());
+  void Lexer::line_end(const std::string_view::const_iterator &it) {
+    lines.push_back(it - source.begin() + 1);
+  }
+
+  Position Lexer::toPosition(ptrdiff_t d) const {
+    auto it = std::upper_bound(lines.begin(), lines.end(), d) - 1;
+    return Position{it - lines.begin() + 1, d - *it + 1};
   }
 }

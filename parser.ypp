@@ -19,6 +19,8 @@
    
    namespace SysY {
       class Driver;
+      void insert_declaration(Driver &,AST::pointer<AST::CompileTimeDeclaration>);
+      void insert_function(Driver &, AST::pointer<AST::Function>);
    }
 #ifndef YY_NULLPTR
 # if defined __cplusplus && 201103L <= __cplusplus
@@ -65,9 +67,8 @@
 
 %code{
    /* include for all driver functions */
-   #include "driver.hpp"
-   SysY::Parser::symbol_type yylex(SysY::Driver &driver) {
-      return driver.lexer();
+   namespace SysY {
+      Parser::symbol_type yylex(SysY::Driver &driver);
    }
 }
 
@@ -121,18 +122,18 @@ comp_unit: /* epsilon */
    | comp_unit declaration 
    {
       for (auto &ptr : $2) {
-         this->driver.unit->globals.emplace_back(std::move(ptr));
+         insert_declaration(driver, std::move(ptr));
       }
    }
    | comp_unit function_definition
    {
-      this->driver.unit->functions.emplace_back(std::move($2));
+      insert_function(driver, std::move($2));
    }
 
 
 %nterm <AST::pointer<AST::ParamDeclaration>> function_param;
 function_param:
-   TYPE IDENT offset_list { $$ = std::make_unique<AST::ParamDeclaration>($2, std::move(*$3), std::make_unique<AST::NoneLiteral>()); }
+   TYPE IDENT offset_list { $$ = std::make_shared<AST::ParamDeclaration>($2, std::move(*$3), std::make_shared<AST::NoneLiteral>()); }
 
 %nterm <AST::container<AST::pointer<AST::ParamDeclaration>>> function_params;
 function_params:
@@ -141,8 +142,8 @@ function_params:
 
 %nterm <AST::pointer<AST::Function>> function_definition;
 function_definition:
-   TYPE IDENT "(" ")" "{" block "}" { $$ = std::make_unique<AST::Function>($1, $2, move($6)); }
-   | TYPE IDENT "(" function_params ")" "{" block "}" { $$ = std::make_unique<AST::Function>($1, $2, std::move($4), move($7)); }
+   TYPE IDENT "(" ")" "{" block "}" { $$ = std::make_shared<AST::Function>($1, $2, move($6)); }
+   | TYPE IDENT "(" function_params ")" "{" block "}" { $$ = std::make_shared<AST::Function>($1, $2, std::move($4), move($7)); }
 
 ////////////////////////////////////////////////////////////////
 /// Declarations ///////////////////////////////////////////////
@@ -165,7 +166,7 @@ const_definition_list:
 %nterm <AST::pointer<AST::ConstDeclaration>> const_definition;
 const_definition:
    IDENT offset_list "=" init_val
-   { $$ = std::make_unique<AST::ConstDeclaration>($1, std::move(*$2), move($4)); }
+   { $$ = std::make_shared<AST::ConstDeclaration>($1, std::move(*$2), move($4)); }
 
 %nterm <AST::container<AST::pointer<AST::VariableDeclaration>>> var_declaration;
 var_declaration:
@@ -178,8 +179,8 @@ var_definition_list:
 
 %nterm <AST::pointer<AST::VariableDeclaration>> var_definition;
 var_definition:
-   IDENT offset_list "=" init_val { $$ = std::make_unique<AST::VariableDeclaration>($1, std::move(*$2), move($4)); }
-   | IDENT offset_list { $$ = std::make_unique<AST::VariableDeclaration>($1, std::move(*$2), std::make_unique<AST::NoneLiteral>()); }
+   IDENT offset_list "=" init_val { $$ = std::make_shared<AST::VariableDeclaration>($1, std::move(*$2), move($4)); }
+   | IDENT offset_list { $$ = std::make_shared<AST::VariableDeclaration>($1, std::move(*$2), std::make_shared<AST::NoneLiteral>()); }
 
 
 ////////////////////////////////////////////////////////////////
@@ -188,39 +189,39 @@ var_definition:
 
 %nterm <AST::pointer<AST::Block>> block;
 block: 
-   /* epsilon */ { $$ = std::make_unique<AST::Block>(); }
+   /* epsilon */ { $$ = std::make_shared<AST::Block>(); }
    | block statement { $$ = move($1); $$->code.emplace_back(move($2)); }
    | block declaration { $$ = move($1); std::move($2.begin(), $2.end(), std::back_inserter($$->code)); }
    | block ";" { $$ = move($1); }
 
 %nterm <AST::pointer<AST::Statement>> statement;
 statement:
-   left_val "=" expr ";" { $$ = std::make_unique<AST::AssignmentStmt>(move($1), move($3)); }
-   | expr ";" { $$ = std::make_unique<AST::ExpressionStmt>(move($1)); }
+   left_val "=" expr ";" { $$ = std::make_shared<AST::AssignmentStmt>(move($1), move($3)); }
+   | expr ";" { $$ = std::make_shared<AST::ExpressionStmt>(move($1)); }
    | "{" block "}" { $$ = move($2); }
    | "if" "(" or_expr ")" statement "else" statement
-                                    { $$ = std::make_unique<AST::IfStmt>(move($3), move($5), move($7)); }
-   | "if" "(" or_expr ")" statement { $$ = std::make_unique<AST::IfStmt>(move($3), move($5)); }
-   | "while" "(" or_expr ")" statement { $$ = std::make_unique<AST::WhileStmt>(move($3), move($5)); }
-   | "break" ";" { $$ = std::make_unique<AST::BreakStmt>(); }
-   | "continue" ";" { $$ = std::make_unique<AST::BreakStmt>(); }
-   | "return" ";" { $$ = std::make_unique<AST::ReturnStmt>(); }
-   | "return" expr ";" { $$ = std::make_unique<AST::ReturnStmt>(move($2)); }
+                                    { $$ = std::make_shared<AST::IfStmt>(move($3), move($5), move($7)); }
+   | "if" "(" or_expr ")" statement { $$ = std::make_shared<AST::IfStmt>(move($3), move($5)); }
+   | "while" "(" or_expr ")" statement { $$ = std::make_shared<AST::WhileStmt>(move($3), move($5)); }
+   | "break" ";" { $$ = std::make_shared<AST::BreakStmt>(); }
+   | "continue" ";" { $$ = std::make_shared<AST::BreakStmt>(); }
+   | "return" ";" { $$ = std::make_shared<AST::ReturnStmt>(); }
+   | "return" expr ";" { $$ = std::make_shared<AST::ReturnStmt>(move($2)); }
 
 %nterm <AST::pointer<AST::PotentialLiteral>> init_val;
 init_val:
    expr { $$ = move($1); }
-   | "{" "}" { $$ = std::make_unique<AST::ArrayLiteral>(); }
+   | "{" "}" { $$ = std::make_shared<AST::ArrayLiteral>(); }
    | "{" init_array "}" { $$ = move($2); }
 
 
 %nterm <AST::pointer<AST::ArrayLiteral>> init_array;
 init_array:
-   init_val { $$ = std::make_unique<AST::ArrayLiteral>(); $$->data.emplace_back(move($1)); }
+   init_val { $$ = std::make_shared<AST::ArrayLiteral>(); $$->data.emplace_back(move($1)); }
    | init_array "," init_val { $$ = move($1); $$->data.emplace_back(move($3)); }
 
 %nterm <AST::pointer<AST::Identifier>> identifier;
-identifier : IDENT { $$ = std::make_unique<AST::Identifier>($1); }
+identifier : IDENT { $$ = std::make_shared<AST::Identifier>($1); }
 
 ////////////////////////////////////////////////////////////////
 /// Expressions ////////////////////////////////////////////////
@@ -232,57 +233,57 @@ expr: add_expr { $$ = move($1); }
 %nterm <AST::pointer<AST::LeftValueExpression>> left_val;
 left_val: 
    identifier { $$ = move($1); }
-   | left_val "[" expr "]" { $$ = std::make_unique<AST::OffsetExpression>(move($1), move($3)); }
+   | left_val "[" expr "]" { $$ = std::make_shared<AST::OffsetExpression>(move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> primary_expr;
 primary_expr: 
    "(" expr ")" { $$ = move($2); }
    | left_val { $$ = move($1); }
-   | INT_LITERAL { $$ = std::make_unique<AST::LiteralExpression>($1); }
+   | INT_LITERAL { $$ = std::make_shared<AST::LiteralExpression>($1); }
 
 %nterm <AST::pointer<AST::Expression>> unary_expr;
 unary_expr:
    primary_expr { $$ = move($1); }
-   | identifier "(" ")" { $$ = std::make_unique<AST::CallExpression>(move($1), AST::FuncParams{}); }
-   | identifier "(" func_params ")" { $$ = std::make_unique<AST::CallExpression>(move($1), std::move(*($3))); }
-   | unary_op unary_expr { $$ = std::make_unique<AST::UnaryExpression>($1, move($2)); }
+   | identifier "(" ")" { $$ = std::make_shared<AST::CallExpression>(move($1), AST::FuncParams{}); }
+   | identifier "(" func_params ")" { $$ = std::make_shared<AST::CallExpression>(move($1), std::move(*($3))); }
+   | unary_op unary_expr { $$ = std::make_shared<AST::UnaryExpression>($1, move($2)); }
 
 %nterm <AST::pointer<AST::Expression>> mul_expr;
 mul_expr:
    unary_expr { $$ = move($1); }
-   | mul_expr "*" unary_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Mult, move($1), move($3)); }
-   | mul_expr "/" unary_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Div, move($1), move($3)); }
-   | mul_expr "%" unary_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Mod, move($1), move($3)); }
+   | mul_expr "*" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Mult, move($1), move($3)); }
+   | mul_expr "/" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Div, move($1), move($3)); }
+   | mul_expr "%" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Mod, move($1), move($3)); }
    
 %nterm <AST::pointer<AST::Expression>> add_expr;
 add_expr :
    mul_expr { $$ = move($1); }
-   | add_expr "+" mul_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Plus, move($1), move($3)); }
-   | add_expr "-" mul_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Minus, move($1), move($3)); }
+   | add_expr "+" mul_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Plus, move($1), move($3)); }
+   | add_expr "-" mul_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Minus, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> rel_expr;
 rel_expr:
    add_expr { $$ = move($1); } 
-   | rel_expr "<" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::LT, move($1), move($3)); }
-   | rel_expr ">" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::GT, move($1), move($3)); }
-   | rel_expr "<=" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::LE, move($1), move($3)); }
-   | rel_expr ">=" add_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::GE, move($1), move($3)); }
+   | rel_expr "<" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::LT, move($1), move($3)); }
+   | rel_expr ">" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::GT, move($1), move($3)); }
+   | rel_expr "<=" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::LE, move($1), move($3)); }
+   | rel_expr ">=" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::GE, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> eq_expr;
 eq_expr:
    rel_expr { $$ = move($1); } 
-   | eq_expr "==" rel_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::EQ, move($1), move($3)); }
-   | eq_expr "!=" rel_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::NE, move($1), move($3)); }
+   | eq_expr "==" rel_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::EQ, move($1), move($3)); }
+   | eq_expr "!=" rel_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::NE, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> and_expr;
 and_expr:
    eq_expr { $$ = move($1); } 
-   | and_expr "&&" eq_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::And, move($1), move($3)); }
+   | and_expr "&&" eq_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::And, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> or_expr;
 or_expr:
    and_expr { $$ = move($1); } 
-   | or_expr "||" and_expr { $$ = std::make_unique<AST::BinaryExpression>(AST::BinaryOp::Or, move($1), move($3)); }
+   | or_expr "||" and_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Or, move($1), move($3)); }
 
 %nterm <AST::UnaryOp> unary_op;
 unary_op:
@@ -296,27 +297,23 @@ unary_op:
 
 %nterm <AST::pointer<AST::FuncParams>> func_params;
 func_params:
-   expr { $$ = std::make_unique<AST::FuncParams>(); $$->params.emplace_back(move($1)); }
+   expr { $$ = std::make_shared<AST::FuncParams>(); $$->params.emplace_back(move($1)); }
    | func_params "," expr { $$ = std::move($1); $$->params.emplace_back(move($3)); }
 
 %nterm <AST::pointer<AST::OffsetList>> offset_list;
 offset_list:
-   /* epsilon */ { $$ = std::make_unique<AST::OffsetList>(); }
-   | "[" "]" { $$ = std::make_unique<AST::OffsetList>(); $$->offsets.emplace_back(std::make_unique<AST::NoneLiteral>()); }
+   /* epsilon */ { $$ = std::make_shared<AST::OffsetList>(); }
+   | "[" "]" { $$ = std::make_shared<AST::OffsetList>(); $$->offsets.emplace_back(std::make_shared<AST::NoneLiteral>()); }
    | offset_list_body { $$ = std::move($1); }
-   | "[" "]" offset_list_body { $$ = std::make_unique<AST::OffsetList>(); $$->offsets.emplace_back(std::make_unique<AST::NoneLiteral>());
+   | "[" "]" offset_list_body { $$ = std::make_shared<AST::OffsetList>(); $$->offsets.emplace_back(std::make_shared<AST::NoneLiteral>());
       std::move($3->offsets.begin(), $3->offsets.end(), std::back_inserter($$->offsets)); }
 
 %nterm <AST::pointer<AST::OffsetList>> offset_list_body;
 offset_list_body:
-   "[" expr "]" { $$ = std::make_unique<AST::OffsetList>(); $$->offsets.emplace_back(move($2)); }
+   "[" expr "]" { $$ = std::make_shared<AST::OffsetList>(); $$->offsets.emplace_back(move($2)); }
    | offset_list_body "[" expr "]" { $$ = std::move($1); $$->offsets.emplace_back(move($3)); }
 %%
 
 
-void SysY::Parser::error( const SysY::Range &l, const std::string &err_message )
-{
-   std::cerr << "Error: " << err_message << " at " << l << "\n";
-}
 
 

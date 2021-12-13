@@ -3,8 +3,11 @@
 #include <sstream>
 #include "parser_wrapper.hpp"
 #include "3rd-party/argparse.hpp"
+#include "run.hpp"
 
 int main(int argc, char **argv) {
+  using namespace SysY;
+
   argparse::ArgumentParser program("wtsyc");
 
   program.add_argument("-T", "--trace")
@@ -43,8 +46,16 @@ int main(int argc, char **argv) {
   std::ifstream ifile(ifilename);
   std::stringstream ibuf;
   ibuf << ifile.rdbuf();
-  auto res = SysY::parse(ibuf.str(), program.get<bool>("--trace"));
+  auto res = parse(ibuf.str(), program.get<bool>("--trace"));
   std::cout << res->toJSON().dump(2) << std::endl;
+
+  // passes
+  try {
+    Pass::verify(res);
+  } catch(const std::runtime_error &e) {
+    std::cerr << typeid(e).name() << ' ' << e.what() << '\n';
+    return -1;
+  }
 
   return 0;
 }

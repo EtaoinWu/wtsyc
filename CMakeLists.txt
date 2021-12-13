@@ -20,6 +20,8 @@ FILE(GLOB FMT_CPP_SRC RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/src/*.cc)
 
 FILE(GLOB FMT_HDR RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/*.h)
 
+find_library(LIBSYSY sysy 3rd-party/sysy-runtime)
+
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl
@@ -37,6 +39,8 @@ target_include_directories(wtsyc
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party)
+
+target_link_libraries(wtsyc ${LIBSYSY})
 
 set_target_properties(wtsyc PROPERTIES
         COTIRE_PREFIX_HEADER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/3rd-party/json")

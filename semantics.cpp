@@ -1,29 +1,29 @@
 #include "semantics.hpp"
-
 #include "fmt/format.h"
+#include <algorithm>
 
 namespace SysY {
+  SemanticType::SemanticType(
+      const std::vector<literal_type> &dimensions_)
+      : dimensions(dimensions_) {
+    calculate_offsets();
+  }
+
+  void SemanticType::calculate_offsets() {
+    offsets.resize(dimensions.size());
+    int prod = 1;
+    for (int i = offsets.size() - 1; i >= 0; --i) {
+      offsets[i] = prod;
+      prod *= dimensions[i];
+    }
+  }
+
   namespace AST {
     std::string OffsetList::toString() const {
       return fmt::format("[{}]", fmt::join(offsets, "]["));
     }
 
-    json OffsetList::toJSON() const {
-      return AST::toJSON(offsets);
-    }
-
-    void SemanticType::calculate_offsets() {
-      offsets = dimensions;
-      for (auto i = offsets.end() - 1; i >= offsets.begin(); i--) {
-        *i *= *(i + 1);
-      }
-      for (auto i = offsets.begin(); i < offsets.end() - 1; i++) {
-        *i = *(i + 1);
-      }
-      if (!offsets.empty()) {
-        offsets.back() = 1;
-      }
-    }
+    json OffsetList::toJSON() const { return AST::toJSON(offsets); }
 
     std::string ConstDeclaration::toString() const {
       return fmt::format("ConstDeclaration {} {} = {}", name,
@@ -112,9 +112,7 @@ namespace SysY {
       return fmt::format("LiteralExpression ({})", val);
     }
 
-    json LiteralExpression::toJSON() const {
-      return val;
-    }
+    json LiteralExpression::toJSON() const { return val; }
 
     std::string UnaryExpression::toString() const {
       return fmt::format("UnaryExpression {} ({})",
@@ -155,9 +153,7 @@ namespace SysY {
       return fmt::format("({})", fmt::join(params, ", "));
     }
 
-    json FuncParams::toJSON() const {
-      return AST::toJSON(params);
-    }
+    json FuncParams::toJSON() const { return AST::toJSON(params); }
 
     std::string CallExpression::toString() const {
       return fmt::format("CallExpression {} {}", func->toString(),
@@ -165,34 +161,23 @@ namespace SysY {
     }
 
     json CallExpression::toJSON() const {
-      return {{"type", "call"},
-              {"func", func->toJSON()},
-              {"args", args.toJSON()}};
+      return {
+          {"type", "call"}, {"func", func->toJSON()}, {"args", args.toJSON()}};
     }
 
-    std::string BreakStmt::toString() const {
-      return "break";
-    }
+    std::string BreakStmt::toString() const { return "break"; }
 
-    json BreakStmt::toJSON() const {
-      return "break";
-    }
+    json BreakStmt::toJSON() const { return "break"; }
 
-    std::string ContinueStmt::toString() const {
-      return "continue";
-    }
+    std::string ContinueStmt::toString() const { return "continue"; }
 
-    json ContinueStmt::toJSON() const {
-      return "continue";
-    }
+    json ContinueStmt::toJSON() const { return "continue"; }
 
     std::string Block::toString() const {
       return fmt::format("{{{}}}", fmt::join(code, "; "));
     }
 
-    json Block::toJSON() const {
-      return AST::toJSON(code);
-    }
+    json Block::toJSON() const { return AST::toJSON(code); }
 
     std::string AssignmentStmt::toString() const {
       return fmt::format("Assignment {} = {}", lhs->toString(),
@@ -222,38 +207,35 @@ namespace SysY {
     }
 
     json ReturnStmt::toJSON() const {
-      return {{"stmt", "return"},
-              {"return",
-               rhs.has_value() ? rhs.value()->toJSON() : json(nullptr)}};
+      return {
+          {"stmt", "return"},
+          {"return", rhs.has_value() ? rhs.value()->toJSON() : json(nullptr)}};
     }
 
     std::string IfStmt::toString() const {
       return else_clause.has_value()
-               ? fmt::format("If {} Then {} Else {}", cond->toString(),
-                             then_clause->toString(),
-                             else_clause.value()->toString())
-               : fmt::format("If {} Then {}", cond->toString(),
-                             then_clause->toString());
+                 ? fmt::format("If {} Then {} Else {}", cond->toString(),
+                               then_clause->toString(),
+                               else_clause.value()->toString())
+                 : fmt::format("If {} Then {}", cond->toString(),
+                               then_clause->toString());
     }
 
     json IfStmt::toJSON() const {
       return {{"stmt", "if"},
               {"if", cond->toJSON()},
               {"then", then_clause->toJSON()},
-              {"else", else_clause.has_value()
-                         ? else_clause.value()->toJSON()
-                         : json(nullptr)}};
+              {"else", else_clause.has_value() ? else_clause.value()->toJSON()
+                                               : json(nullptr)}};
     }
 
     std::string WhileStmt::toString() const {
-      return fmt::format("While {} Do {}", cond->toString(),
-                         body->toString());
+      return fmt::format("While {} Do {}", cond->toString(), body->toString());
     }
 
     json WhileStmt::toJSON() const {
-      return {{"stmt", "while"},
-              {"while", cond->toJSON()},
-              {"do", body->toJSON()}};
+      return {
+          {"stmt", "while"}, {"while", cond->toJSON()}, {"do", body->toJSON()}};
     }
 
     std::string Function::toString() const {
@@ -270,8 +252,7 @@ namespace SysY {
 
     std::string CompUnit::toString() const {
       return fmt::format("CompUnit\nwith declaration: {}\nwith functions: {}",
-                         fmt::join(globals, "\n"),
-                         fmt::join(functions, "\n"));
+                         fmt::join(globals, "\n"), fmt::join(functions, "\n"));
     }
 
     json CompUnit::toJSON() const {
@@ -284,12 +265,9 @@ namespace SysY {
       return fmt::format("ArrayLiteral [{}]", fmt::join(data, ", "));
     }
 
-    json ArrayLiteral::toJSON() const {
-      return AST::toJSON(data);
-    }
+    json ArrayLiteral::toJSON() const { return AST::toJSON(data); }
   } // namespace AST
 } // namespace SysY
-
 
 template <typename T>
 struct fmt::formatter<SysY::AST::pointer<T>> : formatter<string_view> {

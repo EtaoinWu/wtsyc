@@ -27,12 +27,13 @@ namespace SysY {
     int act;
 
     // Line tracing
-    std::vector<ptrdiff_t> lines;
     void line_end(const std::string_view::const_iterator &it);
   public:
+    std::vector<ptrdiff_t> lines = {0};
     Lexer(std::string_view source_);
     Range tokenRange() const;
     Parser::symbol_type exec();
     Parser::symbol_type operator()();
+    Position toPosition(ptrdiff_t d) const;
   };
 }

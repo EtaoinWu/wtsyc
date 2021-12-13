@@ -20,9 +20,35 @@ namespace SysY {
       return "";
     }
   }
+  
+  using literal_type = int;
+
+  class SemanticType {
+  public:
+    std::vector<literal_type> dimensions;
+    std::vector<literal_type> offsets;
+    SemanticType(const std::vector<literal_type> &dimensions_);
+    void calculate_offsets();
+    bool is_scalar() const { return dimensions.size() == 0; }
+    bool is_array() const { return !is_scalar(); }
+  };
 
   namespace AST {
-    template <typename T> using pointer = std::unique_ptr<T>;
+    template <typename T> using pointer = std::shared_ptr<T>;
+    namespace Expressions {
+      class Expression;
+    }
+  }
+
+  namespace ArrayAlign {
+    struct Alignment {
+      int offset;
+      AST::pointer<AST::Expressions::Expression> exp;
+    };
+    using Result = std::vector<Alignment>;
+  }
+
+  namespace AST {
     template <typename T> using container = std::vector<T>;
 
     template <typename T> json toJSON(const container<T> &c) {
@@ -169,28 +195,17 @@ namespace SysY {
         json toJSON() const override;
       };
 
-      class SemanticType {
-      public:
-        std::vector<size_t> dimensions;
-        std::vector<size_t> offsets;
-        SemanticType(const std::vector<size_t> &dimensions_)
-            : dimensions(dimensions_) {
-          calculate_offsets();
-        }
-        void calculate_offsets();
-        bool is_scalar() const { return dimensions.size() == 0; }
-        bool is_array() const { return !is_scalar(); }
-      };
-
       class Declaration : public BlockItem {
       public:
         std::string name;
         std::optional<SemanticType> type;
+        ArrayAlign::Result aligned_init;
         pointer<PotentialLiteral> init_value;
         Declaration(Declaration &&) = default;
         Declaration(const std::string &name_,
                     pointer<PotentialLiteral> init_value_)
             : name(name_), type(std::nullopt),
+              aligned_init(),
               init_value(std::move(init_value_)) {}
       };
 

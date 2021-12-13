@@ -15,6 +15,6 @@ namespace SysY {
     AST::pointer<AST::CompUnit> unit;
     Driver(std::string_view source_)
         : source{source_}, lexer{source_},
-          unit(std::make_unique<AST::CompUnit>()) {}
+          unit(std::make_shared<AST::CompUnit>()) {}
   };
 } // namespace SysY

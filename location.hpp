@@ -10,6 +10,9 @@ namespace SysY {
   struct Position {
     ptrdiff_t line;
     ptrdiff_t character;
+    std::string toString() const {
+      return fmt::format("{}:{}", line, character);
+    }
   };
 
   // range in a file, 0-indexed characters, clopen interval
