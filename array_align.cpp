@@ -21,7 +21,7 @@ namespace SysY::ArrayAlign {
       if (auto arr = std::dynamic_pointer_cast<AST::ArrayLiteral>(item)) {
         current = round_up(current, type.offsets[j]);
         auto rec = _array_align(arr, type, j + 1);
-        for (auto align : rec) {
+        for (auto &align : rec) {
           align.offset += current;
         }
         std::move(rec.begin(), rec.end(), std::back_inserter(alignment));
