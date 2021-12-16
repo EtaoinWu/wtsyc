@@ -45,7 +45,7 @@ namespace F
  * 234 Trees.
  */
 
-#define error_bad_tree()    error("data-structure invariant violated")
+#define error_bad_tree()    macro_error("data-structure invariant violated")
 
 /*
  * Interface renaming.

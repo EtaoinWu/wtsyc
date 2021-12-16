@@ -44,6 +44,7 @@ target_include_directories(wtsyc
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/fpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/fpp/gc/include
 )
 
 target_link_libraries(wtsyc fpp ${LIBSYSY})

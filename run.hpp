@@ -1,4 +1,6 @@
 #pragma once
+#include "3rd-party/fpp/fmap.h"
+#include "3rd-party/fpp/fstring.h"
 #include "3rd-party/json/json.hpp"
 #include "levelmap.hpp"
 #include <optional>

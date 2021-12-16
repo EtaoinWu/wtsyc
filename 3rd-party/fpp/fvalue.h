@@ -165,14 +165,14 @@ public:
     operator const _T&() const
     {
         if (!_have)
-            error("Optional<T> value not present");
+            macro_error("Optional<T> value not present");
         return _val;
     }
 
     operator Value<_T>() const
     {
         if (!_have)
-            error("Optional<T> value not present");
+            macro_error("Optional<T> value not present");
         return _val;  
     }
 
@@ -184,7 +184,7 @@ public:
     const _T &_get()
     {
         if (!_have)
-            error("Optional<T> value not present");
+            macro_error("Optional<T> value not present");
         return _val;  
     }
 };

@@ -68,7 +68,7 @@ extern PURE void *_list_data(List<Word> xs, size_t size,
 extern PURE List<Word> _list_last(List<Word> xs)
 {
     if (empty(xs))
-        error("last []");
+        macro_error("last []");
     while (!empty(tail(xs)))
         xs = tail(xs);
     return xs;

@@ -238,7 +238,7 @@ inline PURE char32_t lookup(String _s, size_t _idx)
 {
     Optional<char32_t> _r = at(_s, _idx);
     if (empty(_r))
-        error("string lookup out-of-bounds");
+        macro_error("string lookup out-of-bounds");
     return char32_t(_r);
 }
 

@@ -49,7 +49,7 @@
 /*
  * Error macro.
  */
-#define error(s, ...)                                                   \
+#define macro_error(s, ...)                                                   \
     do {                                                                \
         std::fprintf(stderr, "error: %s\n", (s));                       \
         std::abort();                                                   \

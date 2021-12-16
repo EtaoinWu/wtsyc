@@ -180,7 +180,7 @@ template <typename _T>
 inline PURE const _T &head(List<_T> _xs)
 {
     if (empty(_xs))
-        error("head []");
+        macro_error("head []");
     const Node<_T> &_node = _xs;
     return _node.elem;
 }
@@ -193,7 +193,7 @@ template <typename _T>
 inline PURE List<_T> tail(List<_T> _xs) 
 {
     if (empty(_xs))
-        error("tail []");
+        macro_error("tail []");
     const Node<_T> &_node = _xs;
     return _node.next;
 }

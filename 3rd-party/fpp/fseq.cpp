@@ -39,7 +39,7 @@ namespace F
  * Finger trees.
  */
 
-#define error_bad_tree()        error("data-structure invariant violated")
+#define error_bad_tree()        macro_error("data-structure invariant violated")
 
 #define SET(ptr, val)                       \
     do {                                    \
@@ -510,13 +510,13 @@ extern PURE Result<Frag, size_t> _seq_lookup(Seq s, size_t idx)
         switch (index(s))
         {
             case NIL:
-                error("seq lookup out-of-range", ERANGE);
+                macro_error("seq lookup out-of-range", ERANGE);
             case SINGLE:
             {
                 const Single &ss = s;
                 if (idx < ss.len)
                     return tree_lookup(ss.t[0], idx);
-                error("seq lookup out-of-range", ERANGE);
+                macro_error("seq lookup out-of-range", ERANGE);
             }
             case DEEP:
             {
@@ -607,7 +607,7 @@ static Result<Frag, size_t> tree_lookup(Tree s, size_t idx)
                 const FragHeader &sh = sl;
                 if (idx < sh._len)
                     return {sl, idx};
-                error("seq lookup out-of-range", ERANGE);
+                macro_error("seq lookup out-of-range", ERANGE);
             }
             case TREE_2:
             {
@@ -726,7 +726,7 @@ static Seq seq_pop_front(Seq s, Tree *t)
     switch (index(s))
     {
         case NIL:
-            error("pop-front empty");
+            macro_error("pop-front empty");
         case SINGLE:
         {
             const Single &ss = s;
@@ -780,7 +780,7 @@ extern PURE Seq _seq_replace_front(Seq s, Frag f)
     switch (index(s))
     {
         case NIL:
-            error("replace-back empty");
+            macro_error("replace-back empty");
         case SINGLE:
             return single(l);
         case DEEP:
@@ -823,7 +823,7 @@ extern PURE Frag _seq_peek_front(Seq s)
     switch (index(s))
     {
         case NIL:
-            error("peek-front empty");
+            macro_error("peek-front empty");
         case SINGLE:
         {
             const Single &ss = s;
@@ -942,7 +942,7 @@ static Seq seq_pop_back(Seq s, Tree *t)
     switch (index(s))
     {
         case NIL:
-            error("pop-back empty");
+            macro_error("pop-back empty");
         case SINGLE:
         {
             const Single &ss = s;
@@ -996,7 +996,7 @@ extern PURE Seq _seq_replace_back(Seq s, Frag f)
     switch (index(s))
     {
         case NIL:
-            error("replace-back empty");
+            macro_error("replace-back empty");
         case SINGLE:
             return single(l);
         case DEEP:
@@ -1039,7 +1039,7 @@ extern PURE Frag _seq_peek_back(Seq s)
     switch (index(s))
     {
         case NIL:
-            error("peek-back empty");
+            macro_error("peek-back empty");
         case SINGLE:
         {
             const Single &ss = s;
@@ -1247,7 +1247,7 @@ extern PURE Result<Seq, Frag, size_t, Seq> _seq_split(Seq s, size_t idx)
     Seq l, r;
     Tree t;
     if (idx >= _seq_length(s))
-        error("split out-of-bounds");
+        macro_error("split out-of-bounds");
     seq_split(s, &idx, &l, &r, &t);
     const Frag &f = t;
     return {l, f, idx, r};
@@ -1261,7 +1261,7 @@ extern PURE Result<Seq, Frag, size_t> _seq_left(Seq s, size_t idx)
     Seq l;
     Tree t;
     if (idx >= _seq_length(s))
-        error("left out-of-bounds");
+        macro_error("left out-of-bounds");
     seq_split(s, &idx, &l, nullptr, &t);
     const Frag &f = t;
     return {l, f, idx};
@@ -1275,7 +1275,7 @@ extern PURE Result<Frag, size_t, Seq> _seq_right(Seq s, size_t idx)
     Seq r;
     Tree t;
     if (idx >= _seq_length(s))
-        error("right out-of-bounds");
+        macro_error("right out-of-bounds");
     seq_split(s, &idx, nullptr, &r, &t);
     const Frag &f = t;
     return {f, idx, r};
@@ -2316,7 +2316,7 @@ extern Frag _seq_itr_get(_SeqItr *itr, size_t *idx_ptr)
     seq_itr_move(itr, itr->_idx);
     Optional<Frag> f = seq_itr_get(itr);
     if (empty(f))
-        error("iterator out-of-bounds access");
+        macro_error("iterator out-of-bounds access");
     if (idx_ptr != nullptr)
     {
         Entry *stack = _bit_cast<Entry *>(itr->_state);

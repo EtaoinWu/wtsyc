@@ -52,7 +52,7 @@ extern PURE String show(const void *p)
     char buf[MAX_PTR_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%pp", p);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -97,7 +97,7 @@ static String show_char(char c)
         int r = snprintf(buf, sizeof(buf)-1, "'\\x%.2x'",
             ((unsigned)c) & 0xFF);
         if (r <= 0 || r >= sizeof(buf)-1)
-            error("snprintf failed");
+            macro_error("snprintf failed");
         return string(buf);
     }
     else
@@ -127,7 +127,7 @@ extern PURE String show(short x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%hd", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -136,7 +136,7 @@ extern PURE String show(unsigned short x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%hu", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -145,7 +145,7 @@ extern PURE String show(int x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%d", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -154,7 +154,7 @@ extern PURE String show(unsigned x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%u", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -163,7 +163,7 @@ extern PURE String show(long int x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%ld", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -172,7 +172,7 @@ extern PURE String show(unsigned long int x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%lu", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -181,7 +181,7 @@ extern PURE String show(long long int x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%lld", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -190,7 +190,7 @@ extern PURE String show(unsigned long long int x)
     char buf[MAX_INT_BUF];
     int r = snprintf(buf, sizeof(buf)-1, "%llu", x);
     if (r <= 0 || r >= sizeof(buf)-1)
-        error("snprintf failed");
+        macro_error("snprintf failed");
     return string(buf);
 }
 
@@ -218,9 +218,9 @@ static String show_float(double x)
     {
         int r = snprintf(buf, sizeof(buf)-1, "%.*g", p, x);
         if (r <= 0 || r >= sizeof(buf)-1)
-            error("snprintf failed");
+            macro_error("snprintf failed");
         if (sscanf(buf, "%lf", &x1) != 1)
-            error("sscanf failed");
+            macro_error("sscanf failed");
         p++;
     }
     while (x != x1);

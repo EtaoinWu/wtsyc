@@ -106,7 +106,7 @@ char32_decode_3_bytes:
     }
 
 char32_decode_bad_seq_error:
-    error("bad utf-8 character encoding", EILSEQ);
+    macro_error("bad utf-8 character encoding", EILSEQ);
 }
 
 /*
@@ -146,7 +146,7 @@ static void char32_encode(char *cstr, char32_t c)
         cstr[0] = c | 0xF0;
         return;
     }
-    error("bad character", EILSEQ);
+    macro_error("bad character", EILSEQ);
 }
 
 /*
@@ -163,7 +163,7 @@ static PURE size_t char32_decode_len(const char *cstr)
         return 3;
     if ((c & 0xF8) == 0xF0)
         return 4;
-    error("bad utf-8 character encoding", EILSEQ);
+    macro_error("bad utf-8 character encoding", EILSEQ);
 }
 
 /*
@@ -179,7 +179,7 @@ static PURE size_t char32_size(char32_t c)
         return 3;
     if (c <= 0x1FFFFF)
         return 4;
-    error("bad character", EILSEQ);
+    macro_error("bad character", EILSEQ);
 }
 
 /*
@@ -833,7 +833,7 @@ extern PURE String show(String s)
             int r = snprintf(buf, sizeof(buf)-1, "\\x%.2x",
                 ((unsigned)c) & 0xFF);
             if (r <= 0 || r >= sizeof(buf)-1)
-                error("snprintf failed");
+                macro_error("snprintf failed");
             return acc + buf;
         }
         return acc + c;
