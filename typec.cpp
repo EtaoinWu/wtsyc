@@ -1,4 +1,4 @@
-#include "run.hpp"
+#include "typec.hpp"
 #include "semantics.hpp"
 #include "3rd-party/fmt/core.h"
 #include "3rd-party/mpark/patterns.hpp"
@@ -114,7 +114,7 @@ namespace SysY {
           util::overloaded{
               [](const EvalPureResult &val) -> eval_t { return val; },
               [&env](const EvalOffsetResult &val) -> eval_t {
-                if (val.pos == val.data->offset_list.offsets.size()) {
+                if ((unsigned) val.pos == val.data->offset_list.offsets.size()) {
                   const auto &z = val.data->aligned_init;
                   auto it = std::lower_bound(
                       z.begin(), z.end(), val.offset,

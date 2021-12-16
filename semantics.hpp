@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <optional>
 #include "json/json.hpp"
-#include "run.hpp"
+#include "typec.hpp"
 
 namespace SysY {
   using nlohmann::json;
