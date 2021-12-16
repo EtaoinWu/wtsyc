@@ -6,6 +6,9 @@ include(cotire)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rd-party/fpp)
+
 add_compile_options(-Wall -Wno-register)
 
 find_package(BISON REQUIRED)
@@ -39,9 +42,11 @@ target_include_directories(wtsyc
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party)
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party
+        ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/fpp
+)
 
-target_link_libraries(wtsyc ${LIBSYSY})
+target_link_libraries(wtsyc fpp ${LIBSYSY})
 
 set_target_properties(wtsyc PROPERTIES
         COTIRE_PREFIX_HEADER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/3rd-party/json")
