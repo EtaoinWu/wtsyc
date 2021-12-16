@@ -4,23 +4,12 @@
 #include <vector>
 #include <type_traits>
 #include <optional>
+#include "primitive.hpp"
 #include "json/json.hpp"
 #include "typec.hpp"
 
 namespace SysY {
   using nlohmann::json;
-  enum class PrimitiveType { INT, VOID };
-
-  inline std::string toString(PrimitiveType t) {
-    switch (t) {
-    case PrimitiveType::INT:
-      return "int";
-    case PrimitiveType::VOID:
-      return "void";
-    default:
-      return "";
-    }
-  }
   
   using literal_type = int;
 
@@ -93,28 +82,6 @@ namespace SysY {
         std::string toString() const override;
         json toJSON() const override { return name; }
       };
-
-      enum class UnaryOp { Plus, Minus, Not };
-
-      std::string toString(UnaryOp t);
-
-      enum class BinaryOp {
-        Plus,
-        Minus,
-        Mult,
-        Div,
-        Mod,
-        LT,
-        GT,
-        LE,
-        GE,
-        NE,
-        EQ,
-        And,
-        Or
-      };
-
-      std::string toString(BinaryOp t);
 
       class LiteralExpression : public Expression {
       public:
@@ -408,13 +375,3 @@ namespace SysY {
       : std::true_type {};
 
 } // namespace SysY
-
-template <typename T, typename = decltype((void)(std::string(*)(T))(
-                          SysY::AST::Expressions::toString))>
-inline std::ostream &operator<<(std::ostream &os, T t) {
-  return os << SysY::AST::Expressions::toString(t);
-}
-
-inline std::ostream &operator<<(std::ostream &os, SysY::PrimitiveType t) {
-  return os << SysY::toString(t);
-}

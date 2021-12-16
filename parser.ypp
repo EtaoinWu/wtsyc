@@ -251,45 +251,45 @@ unary_expr:
 %nterm <AST::pointer<AST::Expression>> mul_expr;
 mul_expr:
    unary_expr { $$ = move($1); }
-   | mul_expr "*" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Mult, move($1), move($3)); }
-   | mul_expr "/" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Div, move($1), move($3)); }
-   | mul_expr "%" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Mod, move($1), move($3)); }
+   | mul_expr "*" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::Mult, move($1), move($3)); }
+   | mul_expr "/" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::Div, move($1), move($3)); }
+   | mul_expr "%" unary_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::Mod, move($1), move($3)); }
    
 %nterm <AST::pointer<AST::Expression>> add_expr;
 add_expr :
    mul_expr { $$ = move($1); }
-   | add_expr "+" mul_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Plus, move($1), move($3)); }
-   | add_expr "-" mul_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Minus, move($1), move($3)); }
+   | add_expr "+" mul_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::Plus, move($1), move($3)); }
+   | add_expr "-" mul_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::Minus, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> rel_expr;
 rel_expr:
    add_expr { $$ = move($1); } 
-   | rel_expr "<" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::LT, move($1), move($3)); }
-   | rel_expr ">" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::GT, move($1), move($3)); }
-   | rel_expr "<=" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::LE, move($1), move($3)); }
-   | rel_expr ">=" add_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::GE, move($1), move($3)); }
+   | rel_expr "<" add_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::LT, move($1), move($3)); }
+   | rel_expr ">" add_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::GT, move($1), move($3)); }
+   | rel_expr "<=" add_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::LE, move($1), move($3)); }
+   | rel_expr ">=" add_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::GE, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> eq_expr;
 eq_expr:
    rel_expr { $$ = move($1); } 
-   | eq_expr "==" rel_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::EQ, move($1), move($3)); }
-   | eq_expr "!=" rel_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::NE, move($1), move($3)); }
+   | eq_expr "==" rel_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::EQ, move($1), move($3)); }
+   | eq_expr "!=" rel_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::NE, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> and_expr;
 and_expr:
    eq_expr { $$ = move($1); } 
-   | and_expr "&&" eq_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::And, move($1), move($3)); }
+   | and_expr "&&" eq_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::And, move($1), move($3)); }
 
 %nterm <AST::pointer<AST::Expression>> or_expr;
 or_expr:
    and_expr { $$ = move($1); } 
-   | or_expr "||" and_expr { $$ = std::make_shared<AST::BinaryExpression>(AST::BinaryOp::Or, move($1), move($3)); }
+   | or_expr "||" and_expr { $$ = std::make_shared<AST::BinaryExpression>(BinaryOp::Or, move($1), move($3)); }
 
-%nterm <AST::UnaryOp> unary_op;
+%nterm <UnaryOp> unary_op;
 unary_op:
-   "+" { $$ = AST::UnaryOp::Plus; }
-   | "-" { $$ = AST::UnaryOp::Minus; }
-   | "!" { $$ = AST::UnaryOp::Not; }
+   "+" { $$ = UnaryOp::Plus; }
+   | "-" { $$ = UnaryOp::Minus; }
+   | "!" { $$ = UnaryOp::Not; }
 
 ////////////////////////////////////////////////////////////////
 /// Utility ////////////////////////////////////////////////////

@@ -3,8 +3,7 @@
 #include <algorithm>
 
 namespace SysY {
-  SemanticType::SemanticType(
-      const std::vector<literal_type> &dimensions_)
+  SemanticType::SemanticType(const std::vector<literal_type> &dimensions_)
       : dimensions(dimensions_) {
     calculate_offsets();
   }
@@ -62,52 +61,6 @@ namespace SysY {
       return fmt::format("Identifier {}", name);
     }
 
-    std::string Expressions::toString(UnaryOp t) {
-      switch (t) {
-      case UnaryOp::Plus:
-        return "+";
-      case UnaryOp::Minus:
-        return "-";
-      case UnaryOp::Not:
-        return "!";
-      default:
-        return "";
-      }
-    }
-
-    std::string Expressions::toString(BinaryOp t) {
-      switch (t) {
-      case BinaryOp::Plus:
-        return "+";
-      case BinaryOp::Minus:
-        return "-";
-      case BinaryOp::Mult:
-        return "*";
-      case BinaryOp::Div:
-        return "/";
-      case BinaryOp::Mod:
-        return "%";
-      case BinaryOp::LT:
-        return "<";
-      case BinaryOp::GT:
-        return ">";
-      case BinaryOp::LE:
-        return "<=";
-      case BinaryOp::GE:
-        return ">=";
-      case BinaryOp::NE:
-        return "!=";
-      case BinaryOp::EQ:
-        return "==";
-      case BinaryOp::And:
-        return "&&";
-      case BinaryOp::Or:
-        return "||";
-      default:
-        return "";
-      }
-    }
-
     std::string LiteralExpression::toString() const {
       return fmt::format("LiteralExpression ({})", val);
     }
@@ -115,25 +68,23 @@ namespace SysY {
     json LiteralExpression::toJSON() const { return val; }
 
     std::string UnaryExpression::toString() const {
-      return fmt::format("UnaryExpression {} ({})",
-                         AST::Expressions::toString(op), ch->toString());
+      return fmt::format("UnaryExpression {} ({})", SysY::toString(op),
+                         ch->toString());
     }
 
     json UnaryExpression::toJSON() const {
-      return {{"type", "unary"},
-              {"op", AST::Expressions::toString(op)},
-              {"ch", ch->toJSON()}};
+      return {
+          {"type", "unary"}, {"op", SysY::toString(op)}, {"ch", ch->toJSON()}};
     }
 
     std::string BinaryExpression::toString() const {
-      return fmt::format("BinaryExpression {} ({}, {})",
-                         AST::Expressions::toString(op), ch0->toString(),
-                         ch1->toString());
+      return fmt::format("BinaryExpression {} ({}, {})", SysY::toString(op),
+                         ch0->toString(), ch1->toString());
     }
 
     json BinaryExpression::toJSON() const {
       return {{"type", "binary"},
-              {"op", AST::Expressions::toString(op)},
+              {"op", SysY::toString(op)},
               {"ch0", ch0->toJSON()},
               {"ch1", ch1->toJSON()}};
     }

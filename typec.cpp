@@ -6,56 +6,11 @@
 #include "error.hpp"
 #include "levelmap.hpp"
 #include "util.hpp"
+#include "primitive.hpp"
 #include <functional>
 #include <unordered_set>
 
 namespace SysY {
-  namespace AST {
-    std::function<int(int)> toOP(UnaryOp t) {
-      switch (t) {
-      case UnaryOp::Plus:
-        return [](int x) -> int { return +x; };
-      case UnaryOp::Minus:
-        return [](int x) -> int { return -x; };
-      case UnaryOp::Not:
-        return [](int x) -> int { return !x; };
-      default:
-        throw Exception::BadOP("");
-      }
-    }
-    std::function<int(int, int)> toOP(BinaryOp t) {
-      switch (t) {
-      case BinaryOp::Plus:
-        return [](int x, int y) -> int { return x + y; };
-      case BinaryOp::Minus:
-        return [](int x, int y) -> int { return x - y; };
-      case BinaryOp::Mult:
-        return [](int x, int y) -> int { return x * y; };
-      case BinaryOp::Div:
-        return [](int x, int y) -> int { return x / y; };
-      case BinaryOp::Mod:
-        return [](int x, int y) -> int { return x % y; };
-      case BinaryOp::LT:
-        return [](int x, int y) -> int { return x < y; };
-      case BinaryOp::GT:
-        return [](int x, int y) -> int { return x > y; };
-      case BinaryOp::LE:
-        return [](int x, int y) -> int { return x <= y; };
-      case BinaryOp::GE:
-        return [](int x, int y) -> int { return x >= y; };
-      case BinaryOp::NE:
-        return [](int x, int y) -> int { return x != y; };
-      case BinaryOp::EQ:
-        return [](int x, int y) -> int { return x == y; };
-      case BinaryOp::And:
-        return [](int x, int y) -> int { return x && y; };
-      case BinaryOp::Or:
-        return [](int x, int y) -> int { return x || y; };
-      default:
-        throw Exception::BadOP("");
-      }
-    }
-  } // namespace AST
 
   namespace Pass {
     using namespace mpark::patterns;
@@ -148,14 +103,14 @@ namespace SysY {
                      std::dynamic_pointer_cast<AST::UnaryExpression>(exp)) {
         AST::literal_type ch =
             std::get<EvalPureResult>(k_eval(x->ch, env)).data;
-        return EvalPureResult{AST::toOP(x->op)(ch)};
+        return EvalPureResult{toOP(x->op)(ch)};
       } else if (auto x =
                      std::dynamic_pointer_cast<AST::BinaryExpression>(exp)) {
         AST::literal_type ch0 =
             std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
         AST::literal_type ch1 =
             std::get<EvalPureResult>(k_eval(x->ch1, env)).data;
-        return EvalPureResult{AST::toOP(x->op)(ch0, ch1)};
+        return EvalPureResult{toOP(x->op)(ch0, ch1)};
       } else if (auto x =
                      std::dynamic_pointer_cast<AST::OffsetExpression>(exp)) {
         AST::literal_type offset =
