@@ -32,6 +32,7 @@ add_executable(wtsyc
     ${CPP_SRC}
     ${FMT_CPP_SRC}
     ${BISON_parser_OUTPUTS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
 )
 
 target_include_directories(wtsyc

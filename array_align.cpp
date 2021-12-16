@@ -34,6 +34,7 @@ namespace SysY::ArrayAlign {
             fmt::format("bad array alignment {}", item->toJSON().dump()));
       }
     }
+    return alignment;
   }
 
   // Perform the array initialzation process.

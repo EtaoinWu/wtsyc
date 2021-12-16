@@ -1,4 +1,5 @@
 #include "run.hpp"
+#include "semantics.hpp"
 #include "3rd-party/fmt/core.h"
 #include "3rd-party/mpark/patterns.hpp"
 #include "array_align.hpp"
@@ -58,6 +59,21 @@ namespace SysY {
 
   namespace Pass {
     using namespace mpark::patterns;
+    SymbolInfo::Category SymbolInfo::category_of(const AST::Node *node) {
+      if (dynamic_cast<const AST::Function *>(node) != nullptr) {
+        return function;
+      } else if (dynamic_cast<const AST::ParamDeclaration *>(node) != nullptr) {
+        return parameter;
+      } else if (dynamic_cast<const AST::CompileTimeDeclaration *>(node) !=
+                 nullptr) {
+        return variable;
+      } else if (dynamic_cast<const AST::Expression *>(node) != nullptr) {
+        return temporary;
+      } else {
+        throw Exception::BadAST(
+            fmt::format("bad {}: {}", __FUNCTION__, node->toJSON().dump()));
+      }
+    }
 
     void distinct_globals(const AST::pointer<AST::CompUnit> &cu) {
       std::unordered_set<std::string> global_names;
@@ -80,6 +96,19 @@ namespace SysY {
       }
     }
 
+    struct EvalPureResult {
+      int data;
+    };
+    struct EvalOffsetResult {
+      rc_ptr<AST::ConstDeclaration> data;
+      int pos;
+      int offset;
+    };
+    using eval_t = std::variant<EvalPureResult, EvalOffsetResult>;
+
+    eval_t k_eval(AST::pointer<AST::Expression> exp, Environment env);
+
+    // Helper function for k_eval
     eval_t clean_up(const eval_t &val, Environment env) {
       return std::visit(
           util::overloaded{
@@ -89,7 +118,7 @@ namespace SysY {
                   const auto &z = val.data->aligned_init;
                   auto it = std::lower_bound(
                       z.begin(), z.end(), val.offset,
-                      [](const auto &x, const auto &y) { return x.offset < y });
+                      [](const auto &x, const auto &y) { return x.offset < y; });
                   if (it == z.end() || it->offset != val.offset) {
                     return EvalPureResult{0};
                   }
@@ -101,6 +130,7 @@ namespace SysY {
           val);
     }
 
+    // Const evaluate an expression w/ environment
     eval_t k_eval(AST::pointer<AST::Expression> exp, Environment env) {
       if (auto x = std::dynamic_pointer_cast<AST::LiteralExpression>(exp)) {
         return EvalPureResult{x->val};
@@ -161,7 +191,7 @@ namespace SysY {
       return dimensions;
     }
 
-    void typecheck(AST::pointer<AST::Node> x, Environment env) {
+    void typecheck(const AST::pointer<AST::Node> &x, Environment env) {
       if (const auto dec =
               std::dynamic_pointer_cast<AST::CompileTimeDeclaration>(x)) {
         dec->type = SemanticType(calculate_dimensions(dec->offset_list, env));
@@ -193,20 +223,44 @@ namespace SysY {
                 std::get<EvalPureResult>(k_eval(init_item.exp, env)).data);
           }
         }
-      } else if (const auto func = std::dynamic_pointer_cast<AST::Function>(x)) {
+      } else if (const auto func =
+                     std::dynamic_pointer_cast<AST::Function>(x)) {
         for (const auto &param : func->params) {
           typecheck(param, env);
         }
         typecheck(func->code, env.clone());
-      } else if (const auto func = std::dynamic_pointer_cast<AST::Block>(x)) {
-        
+      } else if (const auto blk = std::dynamic_pointer_cast<AST::Block>(x)) {
+        blk->env = env;
+        for (const auto &item : blk->code) {
+          if (auto dec = std::dynamic_pointer_cast<AST::CompileTimeDeclaration>(item)) {
+            typecheck(dec, env);
+          } else if (auto blk_ = std::dynamic_pointer_cast<AST::Block>(item)) {
+            typecheck(blk_, env.clone());
+          } else if (auto stmt = std::dynamic_pointer_cast<AST::Statement>(item)) {
+            // non-block statement
+            typecheck(stmt, env);
+          }
+        }
+      } else if (const auto stmt_if = std::dynamic_pointer_cast<AST::IfStmt>(x)) {
+        typecheck(stmt_if->then_clause, env);
+        if (stmt_if->else_clause.has_value()) {
+          typecheck(stmt_if->else_clause.value(), env);
+        }
+      } else if (const auto stmt_while = std::dynamic_pointer_cast<AST::WhileStmt>(x)) {
+        typecheck(stmt_while->body, env);
       } else if (const auto cu = std::dynamic_pointer_cast<AST::CompUnit>(x)) {
+        cu->env = env;
         for (const auto &dec : cu->globals) {
           typecheck(dec, env);
-          env.symbols->insert(dec->name, SymbolInfo{dec});
+          auto cat = SymbolInfo::category_of(dec.get());
+          env.symbols->insert(
+              dec->name, SymbolInfo{cat, env.count[cat]++, dec->length(), dec});
         }
         for (const auto &func : cu->functions) {
-          typecheck(func, env);
+          typecheck(func, env.clone());
+          auto cat = SymbolInfo::category_of(func.get());
+          env.symbols->insert(
+              func->name, SymbolInfo{cat, env.count[cat]++, -1, func});
         }
       }
     }

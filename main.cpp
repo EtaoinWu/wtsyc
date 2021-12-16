@@ -3,7 +3,7 @@
 #include <sstream>
 #include "parser_wrapper.hpp"
 #include "3rd-party/argparse.hpp"
-#include "run.hpp"
+#include "semantics.hpp"
 
 int main(int argc, char **argv) {
   using namespace SysY;
@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
   // passes
   try {
     Pass::verify(res);
+    Pass::typecheck(res);
   } catch(const std::runtime_error &e) {
     std::cerr << typeid(e).name() << ' ' << e.what() << '\n';
     return -1;

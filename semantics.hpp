@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <optional>
 #include "json/json.hpp"
+#include "run.hpp"
 
 namespace SysY {
   using nlohmann::json;
@@ -31,6 +32,13 @@ namespace SysY {
     void calculate_offsets();
     bool is_scalar() const { return dimensions.size() == 0; }
     bool is_array() const { return !is_scalar(); }
+    literal_type length() const {
+      if(dimensions.empty()) {
+        return 1;
+      } else {
+        return dimensions.front() * offsets.front();
+      }
+    }
   };
 
   namespace AST {
@@ -38,6 +46,10 @@ namespace SysY {
     namespace Expressions {
       class Expression;
     }
+  }
+
+  namespace Pass {
+    class Environment;
   }
 
   namespace ArrayAlign {
@@ -63,6 +75,7 @@ namespace SysY {
     public:
       virtual std::string toString() const = 0;
       virtual json toJSON() const = 0;
+      virtual ~Node() = default;
     };
 
     class BlockItem : public Node {};
@@ -207,6 +220,15 @@ namespace SysY {
             : name(name_), type(std::nullopt),
               aligned_init(),
               init_value(std::move(init_value_)) {}
+        bool is_scalar() const {
+          return type.value().is_scalar();
+        }
+        bool is_array() const {
+          return type.value().is_array();
+        }
+        literal_type length() const {
+          return type.value().length();
+        }
       };
 
       class CompileTimeDeclaration : public Declaration {
@@ -266,6 +288,7 @@ namespace SysY {
       class Block : public Statement {
       public:
         container<pointer<BlockItem>> code;
+        std::optional<Pass::Environment> env = std::nullopt;
         Block() = default;
         Block(Block &&) = default;
         std::string toString() const override;
@@ -364,6 +387,7 @@ namespace SysY {
     public:
       container<pointer<CompileTimeDeclaration>> globals;
       container<pointer<Function>> functions;
+      std::optional<Pass::Environment> env = std::nullopt;
       std::string toString() const override;
 
       json toJSON() const override;

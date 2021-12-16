@@ -1,6 +1,10 @@
+const int f[4][2][2]={1,1,4,5,1,{4,{1}},9,1,9};
 int main(int f[][3]) {
   int x;
   read(x);
-  print(x);
+  if (x != 0) {
+    int f = x;
+    print(x);
+  }
   return 0;
 }
