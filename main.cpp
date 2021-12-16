@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
   // passes
   try {
     Pass::verify(res);
-    Pass::typecheck(res);
+    Pass::typecheck(res, std::make_shared<Pass::Environment>());
   } catch(const std::runtime_error &e) {
     std::cerr << typeid(e).name() << ' ' << e.what() << '\n';
     return -1;

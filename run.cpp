@@ -59,7 +59,7 @@ namespace SysY {
 
   namespace Pass {
     using namespace mpark::patterns;
-    SymbolInfo::Category SymbolInfo::category_of(const AST::Node *node) {
+    LowLevelSymbolInfo::Category LowLevelSymbolInfo::category_of(const AST::Node *node) {
       if (dynamic_cast<const AST::Function *>(node) != nullptr) {
         return function;
       } else if (dynamic_cast<const AST::ParamDeclaration *>(node) != nullptr) {
@@ -106,10 +106,10 @@ namespace SysY {
     };
     using eval_t = std::variant<EvalPureResult, EvalOffsetResult>;
 
-    eval_t k_eval(AST::pointer<AST::Expression> exp, Environment env);
+    eval_t k_eval(AST::pointer<AST::Expression> exp, environment_t env);
 
     // Helper function for k_eval
-    eval_t clean_up(const eval_t &val, Environment env) {
+    eval_t clean_up(const eval_t &val, environment_t env) {
       return std::visit(
           util::overloaded{
               [](const EvalPureResult &val) -> eval_t { return val; },
@@ -131,13 +131,13 @@ namespace SysY {
     }
 
     // Const evaluate an expression w/ environment
-    eval_t k_eval(AST::pointer<AST::Expression> exp, Environment env) {
+    eval_t k_eval(AST::pointer<AST::Expression> exp, environment_t env) {
       if (auto x = std::dynamic_pointer_cast<AST::LiteralExpression>(exp)) {
         return EvalPureResult{x->val};
       } else if (auto x = std::dynamic_pointer_cast<AST::Identifier>(exp)) {
         const auto &name = x->name;
-        if (env.symbols->count(name)) {
-          auto ptr = env.symbols->at(name).ptr;
+        if (env->symbols->count(name)) {
+          auto ptr = env->symbols->at(name).ptr;
           if (auto k = std::dynamic_pointer_cast<AST::ConstDeclaration>(ptr)) {
             return clean_up(EvalOffsetResult{k, 0, 0}, env);
           }
@@ -175,7 +175,7 @@ namespace SysY {
     void verify(const AST::pointer<AST::CompUnit> &cu) { distinct_globals(cu); }
 
     AST::container<AST::literal_type>
-    calculate_dimensions(const AST::OffsetList &offset_list, Environment env) {
+    calculate_dimensions(const AST::OffsetList &offset_list, environment_t env) {
       AST::container<AST::literal_type> dimensions;
       for (const auto &offset : offset_list.offsets) {
         if (std::dynamic_pointer_cast<AST::NoneLiteral>(offset)) {
@@ -191,7 +191,7 @@ namespace SysY {
       return dimensions;
     }
 
-    void typecheck(const AST::pointer<AST::Node> &x, Environment env) {
+    void typecheck(const AST::pointer<AST::Node> &x, environment_t env) {
       if (const auto dec =
               std::dynamic_pointer_cast<AST::CompileTimeDeclaration>(x)) {
         dec->type = SemanticType(calculate_dimensions(dec->offset_list, env));
@@ -228,14 +228,14 @@ namespace SysY {
         for (const auto &param : func->params) {
           typecheck(param, env);
         }
-        typecheck(func->code, env.clone());
+        typecheck(func->code, env->clone());
       } else if (const auto blk = std::dynamic_pointer_cast<AST::Block>(x)) {
         blk->env = env;
         for (const auto &item : blk->code) {
           if (auto dec = std::dynamic_pointer_cast<AST::CompileTimeDeclaration>(item)) {
             typecheck(dec, env);
           } else if (auto blk_ = std::dynamic_pointer_cast<AST::Block>(item)) {
-            typecheck(blk_, env.clone());
+            typecheck(blk_, env->clone());
           } else if (auto stmt = std::dynamic_pointer_cast<AST::Statement>(item)) {
             // non-block statement
             typecheck(stmt, env);
@@ -252,15 +252,15 @@ namespace SysY {
         cu->env = env;
         for (const auto &dec : cu->globals) {
           typecheck(dec, env);
-          auto cat = SymbolInfo::category_of(dec.get());
-          env.symbols->insert(
-              dec->name, SymbolInfo{cat, env.count[cat]++, dec->length(), dec});
+          auto cat = LowLevelSymbolInfo::category_of(dec.get());
+          env->symbols->insert(
+              dec->name, LowLevelSymbolInfo{cat, env->get_count(cat), dec->length(), dec});
         }
         for (const auto &func : cu->functions) {
-          typecheck(func, env.clone());
-          auto cat = SymbolInfo::category_of(func.get());
-          env.symbols->insert(
-              func->name, SymbolInfo{cat, env.count[cat]++, -1, func});
+          typecheck(func, env->clone());
+          auto cat = LowLevelSymbolInfo::category_of(func.get());
+          env->symbols->insert(
+              func->name, LowLevelSymbolInfo{cat, env->get_count(cat), -1, func});
         }
       }
     }

@@ -34,7 +34,7 @@ namespace SysY {
     bool is_array() const { return !is_scalar(); }
     literal_type length() const {
       if(dimensions.empty()) {
-        return 1;
+        return 0;
       } else {
         return dimensions.front() * offsets.front();
       }
@@ -46,10 +46,6 @@ namespace SysY {
     namespace Expressions {
       class Expression;
     }
-  }
-
-  namespace Pass {
-    class Environment;
   }
 
   namespace ArrayAlign {
@@ -288,7 +284,7 @@ namespace SysY {
       class Block : public Statement {
       public:
         container<pointer<BlockItem>> code;
-        std::optional<Pass::Environment> env = std::nullopt;
+        Pass::environment_t env = nullptr;
         Block() = default;
         Block(Block &&) = default;
         std::string toString() const override;
@@ -387,7 +383,7 @@ namespace SysY {
     public:
       container<pointer<CompileTimeDeclaration>> globals;
       container<pointer<Function>> functions;
-      std::optional<Pass::Environment> env = std::nullopt;
+      Pass::environment_t env = nullptr;
       std::string toString() const override;
 
       json toJSON() const override;
