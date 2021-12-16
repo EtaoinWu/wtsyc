@@ -11,6 +11,16 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/3rd-party/fpp)
 
 add_compile_options(-Wall -Wno-register)
 
+# Make ninja happy with color outputs
+option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+if (${FORCE_COLORED_OUTPUT})
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+       add_compile_options (-fdiagnostics-color=always)
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+       add_compile_options (-fcolor-diagnostics)
+    endif ()
+endif ()
+
 find_package(BISON REQUIRED)
 
 BISON_TARGET(parser
