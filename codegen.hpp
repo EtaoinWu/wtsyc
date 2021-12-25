@@ -1,10 +1,8 @@
 #pragma once
-#include "3rd-party/fpp/fstring.h"
 #include "primitive.hpp"
 #include <string>
 #include <variant>
 #include <vector>
-#include "util.hpp"
 
 
 namespace SysY {
@@ -18,7 +16,7 @@ namespace SysY {
       VCategory cat;
       int id;
     };
-    using VariableX = VariableI;
+    using VariableX = sum_t<VariableI>;
 
     using Literal = int;
     using Operand = sum_t<VariableI, Literal>;
@@ -49,7 +47,7 @@ namespace SysY {
     };
     // Array Read
     struct ExprAR {
-      Operand dst;
+      VariableX dst;
       // base
       VariableX src_b;
       // increment
@@ -78,7 +76,7 @@ namespace SysY {
     };
 
     struct CallI {
-      Operand ret;
+      VariableX ret;
       std::string func;
     };
     struct CallV {
@@ -115,5 +113,7 @@ namespace SysY {
       container<DeclarationX> global;
       container<Function> func;
     };
+
+    std::string outputProgram(Program x);
   } // namespace Eeyore
 } // namespace SysY

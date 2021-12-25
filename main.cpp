@@ -4,8 +4,11 @@
 #include "parser_wrapper.hpp"
 #include "3rd-party/argparse.hpp"
 #include "semantics.hpp"
+#include <gc/gc_cpp.h>
 
 int main(int argc, char **argv) {
+  GC_INIT();
+  
   using namespace SysY;
 
   argparse::ArgumentParser program("wtsyc");
