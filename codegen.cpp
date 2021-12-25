@@ -100,6 +100,7 @@ namespace SysY::Eeyore {
     for (auto const &stmt : func.code) {
       result += INDENT + outputStmt(stmt) + EOL;
     }
+    result += F::string(fmt::format("end f_{}\n", func.name).c_str());
     return result;
   }
 
@@ -115,4 +116,29 @@ namespace SysY::Eeyore {
     }
     return std::string{F::c_str(result)};
   }
+
+  struct Test {
+    Test() {
+      auto test_prog = Program{
+          {
+              DeclarationS{VariableI{VCategory::var, 0}},
+              DeclarationA{VariableI{VCategory::var, 0}, 40},
+          },
+          {Function{"main",
+                    0,
+                    {
+
+                        DeclarationS{VariableI{VCategory::var, 2}},
+                        DeclarationS{VariableI{VCategory::var, 3}},
+                        DeclarationS{VariableI{VCategory::temp, 0}},
+                        DeclarationS{VariableI{VCategory::temp, 1}},
+                        DeclarationS{VariableI{VCategory::temp, 2}},
+                    },
+                    {
+                        CallI{VariableI{VCategory::var, 0}, "getint"},
+                        RetI{0},
+                    }}}};
+      auto output = outputProgram(test_prog);
+    }
+  };
 } // namespace SysY::Eeyore
