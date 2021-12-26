@@ -4,7 +4,6 @@
 #include <variant>
 #include <vector>
 
-
 namespace SysY {
   namespace Eeyore {
     template <typename T> using container = std::vector<T>;

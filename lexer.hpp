@@ -1,13 +1,12 @@
 #pragma once
 
-#include <string_view>
-#include <set>
-#include "parser.hpp"
 #include "location.hpp"
+#include "parser.hpp"
+#include <set>
+#include <string_view>
 
 namespace SysY {
-  class Lexer
-  {
+  class Lexer {
   private:
     std::string_view source;
 
@@ -28,6 +27,7 @@ namespace SysY {
 
     // Line tracing
     void line_end(const std::string_view::const_iterator &it);
+
   public:
     std::vector<ptrdiff_t> lines = {0};
     Lexer(std::string_view source_);
@@ -36,4 +36,4 @@ namespace SysY {
     Parser::symbol_type operator()();
     Position toPosition(ptrdiff_t d) const;
   };
-}
+} // namespace SysY

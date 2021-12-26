@@ -1,6 +1,6 @@
 #include "semantics.hpp"
-#include <fmt/format.h>
 #include <algorithm>
+#include <fmt/format.h>
 
 namespace SysY {
   SemanticType::SemanticType(const std::vector<literal_type> &dimensions_)

@@ -1,13 +1,13 @@
 #include "typec.hpp"
-#include <fmt/core.h>
-#include <mpark/patterns.hpp>
 #include "array_align.hpp"
 #include "error.hpp"
 #include "levelmap.hpp"
 #include "primitive.hpp"
 #include "semantics.hpp"
 #include "util.hpp"
+#include <fmt/core.h>
 #include <functional>
+#include <mpark/patterns.hpp>
 #include <unordered_set>
 
 namespace SysY {

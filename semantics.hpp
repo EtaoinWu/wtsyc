@@ -1,16 +1,16 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <type_traits>
-#include <optional>
 #include "primitive.hpp"
-#include "json/json.hpp"
 #include "typec.hpp"
+#include <json/json.hpp>
+#include <optional>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace SysY {
   using nlohmann::json;
-  
+
   using literal_type = int;
 
   class SemanticType {
@@ -22,7 +22,7 @@ namespace SysY {
     bool is_scalar() const { return dimensions.size() == 0; }
     bool is_array() const { return !is_scalar(); }
     literal_type length() const {
-      if(dimensions.empty()) {
+      if (dimensions.empty()) {
         return 0;
       } else {
         return dimensions.front() * offsets.front();
@@ -35,7 +35,7 @@ namespace SysY {
     namespace Expressions {
       class Expression;
     }
-  }
+  } // namespace AST
 
   namespace ArrayAlign {
     struct Alignment {
@@ -43,7 +43,7 @@ namespace SysY {
       AST::pointer<AST::Expressions::Expression> exp;
     };
     using Result = std::vector<Alignment>;
-  }
+  } // namespace ArrayAlign
 
   namespace AST {
     template <typename T> using container = std::vector<T>;
@@ -180,18 +180,11 @@ namespace SysY {
         Declaration(Declaration &&) = default;
         Declaration(const std::string &name_,
                     pointer<PotentialLiteral> init_value_)
-            : name(name_), type(std::nullopt),
-              aligned_init(),
+            : name(name_), type(std::nullopt), aligned_init(),
               init_value(std::move(init_value_)) {}
-        bool is_scalar() const {
-          return type.value().is_scalar();
-        }
-        bool is_array() const {
-          return type.value().is_array();
-        }
-        literal_type length() const {
-          return type.value().length();
-        }
+        bool is_scalar() const { return type.value().is_scalar(); }
+        bool is_array() const { return type.value().is_array(); }
+        literal_type length() const { return type.value().length(); }
       };
 
       class CompileTimeDeclaration : public Declaration {
