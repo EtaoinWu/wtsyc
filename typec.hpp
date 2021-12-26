@@ -1,8 +1,8 @@
 #pragma once
-#include "3rd-party/fpp/fmap.h"
-#include "3rd-party/fpp/fstring.h"
-#include "3rd-party/json/json.hpp"
 #include "levelmap.hpp"
+#include <fpp/fmap.h>
+#include <fpp/fstring.h>
+#include <json/json.hpp>
 #include <optional>
 #include <variant>
 
@@ -11,13 +11,18 @@ namespace SysY {
     template <typename T> using pointer = std::shared_ptr<T>;
     class Node;
     class CompUnit;
-  }
+  } // namespace AST
 
   namespace Pass {
     template <typename T> using rc_ptr = std::shared_ptr<T>;
     struct LowLevelSymbolInfo {
       enum Category {
-        undetermined, variable, temporary, parameter, function, n_categories
+        undetermined,
+        variable,
+        temporary,
+        parameter,
+        function,
+        n_categories
       } category;
       static Category category_of(const AST::Node *node);
       int count;
@@ -32,7 +37,7 @@ namespace SysY {
     public:
       using symbolinfo_t = LowLevelSymbolInfo;
       using symbol_map_t = Utility::levelmap<std::string, symbolinfo_t>;
-      
+
       rc_ptr<symbol_map_t> symbols = std::make_shared<symbol_map_t>();
       rc_ptr<int> variable_count = std::make_shared<int>(0);
 

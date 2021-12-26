@@ -1,6 +1,6 @@
 #include "codegen.hpp"
-#include "3rd-party/fpp/fstring.h"
-#include "fmt/format.h"
+#include <fpp/fstring.h>
+#include <fmt/core.h>
 #include "util.hpp"
 
 namespace SysY::Eeyore {

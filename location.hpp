@@ -1,6 +1,6 @@
 #pragma once
 
-#include "3rd-party/fmt/core.h"
+#include <fmt/core.h>
 #include <iostream>
 #include <string_view>
 #include <cstdint>

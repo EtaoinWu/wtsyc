@@ -1,6 +1,6 @@
 #include "typec.hpp"
-#include "3rd-party/fmt/core.h"
-#include "3rd-party/mpark/patterns.hpp"
+#include <fmt/core.h>
+#include <mpark/patterns.hpp>
 #include "array_align.hpp"
 #include "error.hpp"
 #include "levelmap.hpp"
