@@ -19,6 +19,7 @@ namespace SysY {
     std::vector<literal_type> offsets;
     SemanticType(const std::vector<literal_type> &dimensions_);
     void calculate_offsets();
+    SemanticType drop_first() const;
     bool is_scalar() const { return dimensions.size() == 0; }
     bool is_array() const { return !is_scalar(); }
     literal_type length() const {
@@ -326,6 +327,8 @@ namespace SysY {
       std::string name;
       container<pointer<ParamDeclaration>> params;
       pointer<Block> code;
+      Pass::environment_t env = nullptr;
+
       Function(PrimitiveType ret_, const std::string &name_,
                decltype(params) params_, decltype(code) code_)
           : ret{ret_}, name{name_}, params{std::move(params_)}, code{move(

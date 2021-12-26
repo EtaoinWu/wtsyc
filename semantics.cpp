@@ -8,6 +8,13 @@ namespace SysY {
     calculate_offsets();
   }
 
+  SemanticType SemanticType::drop_first() const {
+    auto result = *this;
+    result.dimensions.erase(result.dimensions.begin());
+    result.offsets.erase(result.offsets.begin());
+    return result;
+  }
+
   void SemanticType::calculate_offsets() {
     offsets.resize(dimensions.size());
     int prod = 1;
