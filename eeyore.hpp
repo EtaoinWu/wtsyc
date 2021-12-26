@@ -114,6 +114,6 @@ namespace SysY {
       container<Function> func;
     };
 
-    std::string outputProgram(const Program &prog);
+    std::string output_program(const Program &prog);
   } // namespace Eeyore
 } // namespace SysY

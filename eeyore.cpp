@@ -105,7 +105,7 @@ namespace SysY::Eeyore {
     return result;
   }
 
-  std::string outputProgram(const Program &prog) {
+  std::string output_program(const Program &prog) {
     F::String result = EMPTY;
     for (auto const &dec : prog.global) {
       result += outputDecl(dec) + EOL;
@@ -139,7 +139,7 @@ namespace SysY::Eeyore {
                                 CallI{VariableI{VCategory::var, 0}, "getint"},
                                 RetI{0},
                             }}}};
-      auto output = outputProgram(test_prog);
+      auto output = output_program(test_prog);
       DEBUG_LOG("\n" + output);
     }
   };
