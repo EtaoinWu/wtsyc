@@ -7,6 +7,8 @@ namespace SysY::Utility {
   template <typename Key, typename Value>
   using underlying_map = std::unordered_map<Key, Value>;
 
+  // Auxiliary data structure for persistant map
+  // refactor with F::Map one day?
   template <typename Key, typename Value>
   class levelmap : public std::enable_shared_from_this<levelmap<Key, Value>> {
   public:

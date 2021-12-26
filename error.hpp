@@ -6,6 +6,7 @@
 
 
 namespace SysY {
+  // Output a debug log with a proper format
   void debug_log(std::string_view file, std::string_view func, int line, std::string_view msg);
 }
 

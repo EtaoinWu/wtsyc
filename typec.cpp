@@ -183,9 +183,16 @@ namespace SysY {
         }
       } else if (const auto func =
                      std::dynamic_pointer_cast<AST::Function>(x)) {
+        int param_cnt = 0;
         for (const auto &param : func->params) {
           typecheck(param, env);
+          
+          auto cat = LowLevelSymbolInfo::category_of(param.get());
+          env->symbols->insert(
+              param->name,
+              LowLevelSymbolInfo{cat, param_cnt++, dec->length(), dec});
         }
+        func->env = env;
         typecheck(func->code, env->clone());
       } else if (const auto blk = std::dynamic_pointer_cast<AST::Block>(x)) {
         blk->env = env;

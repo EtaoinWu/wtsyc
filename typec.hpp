@@ -24,10 +24,15 @@ namespace SysY {
         function,
         n_categories
       } category;
-      static Category category_of(const AST::Node *node);
+
+      // For eeyore
       int count;
+      
+      // length == 0: scalar
       int length;
       rc_ptr<AST::Node> ptr;
+
+      static Category category_of(const AST::Node *node);
     };
 
     class Environment;
@@ -40,16 +45,11 @@ namespace SysY {
 
       rc_ptr<symbol_map_t> symbols = std::make_shared<symbol_map_t>();
       rc_ptr<int> variable_count = std::make_shared<int>(0);
+      rc_ptr<int> temp_count = std::make_shared<int>(0);
 
       environment_t clone() const {
         auto x = std::make_shared<Environment>(*this);
         x->symbols = x->symbols->clone();
-        return x;
-      }
-
-      environment_t strong_clone() const {
-        auto x = clone();
-        x->variable_count = std::make_shared<int>(0);
         return x;
       }
 
