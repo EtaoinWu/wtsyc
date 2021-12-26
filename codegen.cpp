@@ -1,7 +1,8 @@
 #include "codegen.hpp"
-#include <fpp/fstring.h>
-#include <fmt/core.h>
+#include "error.hpp"
 #include "util.hpp"
+#include <fmt/core.h>
+#include <fpp/fstring.h>
 
 namespace SysY::Eeyore {
   const F::String EMPTY = F::string("");
@@ -119,26 +120,27 @@ namespace SysY::Eeyore {
 
   struct Test {
     Test() {
-      auto test_prog = Program{
-          {
-              DeclarationS{VariableI{VCategory::var, 0}},
-              DeclarationA{VariableI{VCategory::var, 0}, 40},
-          },
-          {Function{"main",
-                    0,
-                    {
+      auto test_prog =
+          Program{{
+                      DeclarationS{VariableI{VCategory::var, 0}},
+                      DeclarationA{VariableI{VCategory::var, 0}, 40},
+                  },
+                  {Function{"main",
+                            0,
+                            {
 
-                        DeclarationS{VariableI{VCategory::var, 2}},
-                        DeclarationS{VariableI{VCategory::var, 3}},
-                        DeclarationS{VariableI{VCategory::temp, 0}},
-                        DeclarationS{VariableI{VCategory::temp, 1}},
-                        DeclarationS{VariableI{VCategory::temp, 2}},
-                    },
-                    {
-                        CallI{VariableI{VCategory::var, 0}, "getint"},
-                        RetI{0},
-                    }}}};
+                                DeclarationS{VariableI{VCategory::var, 2}},
+                                DeclarationS{VariableI{VCategory::var, 3}},
+                                DeclarationS{VariableI{VCategory::temp, 0}},
+                                DeclarationS{VariableI{VCategory::temp, 1}},
+                                DeclarationS{VariableI{VCategory::temp, 2}},
+                            },
+                            {
+                                CallI{VariableI{VCategory::var, 0}, "getint"},
+                                RetI{0},
+                            }}}};
       auto output = outputProgram(test_prog);
+      DEBUG_LOG("\n" + output);
     }
   };
 } // namespace SysY::Eeyore
