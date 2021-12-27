@@ -1,8 +1,8 @@
+#include <argparse.hpp>
 #include "error.hpp"
 #include "gen_eeyore.hpp"
 #include "parser_wrapper.hpp"
 #include "semantics.hpp"
-#include <argparse.hpp>
 #include <fstream>
 #include <gc/gc_cpp.h>
 #include <iostream>
