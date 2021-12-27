@@ -192,11 +192,11 @@ block:
    /* epsilon */ { $$ = std::make_shared<AST::Block>(); $$->range = @$; }
    | block statement { $$ = move($1); $$->code.emplace_back(move($2)); $$->range = @$; }
    | block declaration { $$ = move($1); std::move($2.begin(), $2.end(), std::back_inserter($$->code)); $$->range = @$; }
-   | block ";" { $$ = move($1); $$->range = @$; }
 
 %nterm <AST::pointer<AST::Statement>> statement;
 statement:
-   left_val "=" expr ";" { $$ = std::make_shared<AST::AssignmentStmt>(move($1), move($3)); $$->range = @$; }
+   ";" { $$ = std::make_shared<AST::EmptyStmt>(); $$->range = @$; }
+   | left_val "=" expr ";" { $$ = std::make_shared<AST::AssignmentStmt>(move($1), move($3)); $$->range = @$; }
    | expr ";" { $$ = std::make_shared<AST::ExpressionStmt>(move($1)); $$->range = @$; }
    | "{" block "}" { $$ = move($2); $$->range = @$; }
    | "if" "(" or_expr ")" statement "else" statement
