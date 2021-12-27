@@ -6,4 +6,4 @@ wtsyc
 *.parse.cpp
 
 MiniVM/
-test/*
+test/

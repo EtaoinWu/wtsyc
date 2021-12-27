@@ -108,13 +108,13 @@ namespace SysY::Pass {
       for (const auto &res : dec->aligned_init) {
         auto [code, var, _] = generate_expr(res.exp, env);
         code.emplace_back(Eeyore::ExprAW{ref, res.offset * 4, var});
-        initializer_code.insert(
-          initializer_code.end(), code.begin(), code.end());
+        merge_into(initializer_code, code);
       }
     } else {
       for (const auto &res : dec->aligned_init) {
         auto [code, var, _] = generate_expr(res.exp, env);
         code.emplace_back(Eeyore::ExprC{ref, var});
+        merge_into(initializer_code, code);
       }
     }
     return std::make_tuple(initializer_code, info);

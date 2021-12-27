@@ -23,165 +23,165 @@ namespace {
 #line 24 "/home/etaoin/wtsyc/lexer.cpp"
 static const char _rule_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
-	3, 1, 16, 1, 17, 1, 18, 1, 
-	19, 1, 20, 1, 21, 1, 22, 1, 
-	23, 1, 24, 1, 25, 1, 26, 1, 
-	27, 1, 28, 1, 29, 1, 30, 1, 
-	31, 1, 32, 1, 33, 1, 34, 1, 
-	35, 1, 36, 1, 37, 1, 38, 1, 
-	39, 1, 40, 1, 41, 1, 42, 1, 
-	43, 1, 44, 1, 45, 1, 46, 1, 
-	47, 1, 48, 2, 3, 5, 2, 3, 
-	6, 2, 3, 7, 2, 3, 8, 2, 
-	3, 9, 2, 3, 10, 2, 3, 11, 
-	2, 3, 12, 2, 3, 13, 2, 3, 
-	14, 2, 3, 15, 3, 3, 0, 4
-	
+	3, 1, 14, 1, 15, 1, 16, 1, 
+	18, 1, 19, 1, 20, 1, 21, 1, 
+	22, 1, 23, 1, 24, 1, 25, 1, 
+	26, 1, 27, 1, 28, 1, 29, 1, 
+	30, 1, 31, 1, 32, 1, 33, 1, 
+	34, 1, 35, 1, 36, 1, 37, 1, 
+	38, 1, 39, 1, 40, 1, 41, 1, 
+	42, 1, 43, 1, 44, 1, 45, 1, 
+	46, 2, 0, 17, 2, 3, 4, 2, 
+	3, 5, 2, 3, 6, 2, 3, 7, 
+	2, 3, 8, 2, 3, 9, 2, 3, 
+	10, 2, 3, 11, 2, 3, 12, 2, 
+	3, 13
 };
 
 static const short _rule_key_offsets[] = {
-	0, 0, 1, 3, 6, 7, 13, 14, 
-	53, 54, 56, 57, 61, 63, 69, 71, 
-	72, 73, 74, 81, 89, 97, 105, 113, 
-	121, 129, 138, 146, 154, 162, 170, 178, 
-	186, 194, 202, 211, 219, 227, 235, 243, 
-	251, 259, 267, 275, 283, 291, 299, 307
+	0, 0, 1, 5, 10, 13, 19, 20, 
+	59, 60, 62, 66, 68, 74, 76, 77, 
+	78, 79, 86, 94, 102, 110, 118, 126, 
+	134, 143, 151, 159, 167, 175, 183, 191, 
+	199, 207, 216, 224, 232, 240, 248, 256, 
+	264, 272, 280, 288, 296, 304, 312
 };
 
 static const char _rule_trans_keys[] = {
-	38, 10, 42, 10, 42, 47, 10, 48, 
-	57, 65, 70, 97, 102, 124, 10, 32, 
-	33, 37, 38, 40, 41, 42, 43, 44, 
-	45, 46, 47, 48, 59, 60, 61, 62, 
-	91, 93, 95, 98, 99, 101, 105, 114, 
-	118, 119, 123, 124, 125, 9, 13, 49, 
-	57, 65, 90, 97, 122, 61, 42, 47, 
-	10, 88, 120, 48, 55, 48, 55, 48, 
-	57, 65, 70, 97, 102, 48, 57, 61, 
-	61, 61, 95, 48, 57, 65, 90, 97, 
-	122, 95, 114, 48, 57, 65, 90, 97, 
-	122, 95, 101, 48, 57, 65, 90, 97, 
-	122, 95, 97, 48, 57, 65, 90, 98, 
-	122, 95, 107, 48, 57, 65, 90, 97, 
-	122, 95, 111, 48, 57, 65, 90, 97, 
-	122, 95, 110, 48, 57, 65, 90, 97, 
-	122, 95, 115, 116, 48, 57, 65, 90, 
-	97, 122, 95, 116, 48, 57, 65, 90, 
-	97, 122, 95, 105, 48, 57, 65, 90, 
-	97, 122, 95, 110, 48, 57, 65, 90, 
-	97, 122, 95, 117, 48, 57, 65, 90, 
-	97, 122, 95, 101, 48, 57, 65, 90, 
-	97, 122, 95, 108, 48, 57, 65, 90, 
-	97, 122, 95, 115, 48, 57, 65, 90, 
-	97, 122, 95, 101, 48, 57, 65, 90, 
-	97, 122, 95, 102, 110, 48, 57, 65, 
-	90, 97, 122, 95, 116, 48, 57, 65, 
-	90, 97, 122, 95, 101, 48, 57, 65, 
-	90, 97, 122, 95, 116, 48, 57, 65, 
-	90, 97, 122, 95, 117, 48, 57, 65, 
-	90, 97, 122, 95, 114, 48, 57, 65, 
-	90, 97, 122, 95, 110, 48, 57, 65, 
-	90, 97, 122, 95, 111, 48, 57, 65, 
-	90, 97, 122, 95, 105, 48, 57, 65, 
-	90, 97, 122, 95, 100, 48, 57, 65, 
-	90, 97, 122, 95, 104, 48, 57, 65, 
-	90, 97, 122, 95, 105, 48, 57, 65, 
-	90, 97, 122, 95, 108, 48, 57, 65, 
-	90, 97, 122, 95, 101, 48, 57, 65, 
-	90, 97, 122, 0
+	38, 10, 42, 32, 126, 10, 42, 47, 
+	32, 126, 10, 32, 126, 48, 57, 65, 
+	70, 97, 102, 124, 10, 32, 33, 37, 
+	38, 40, 41, 42, 43, 44, 45, 46, 
+	47, 48, 59, 60, 61, 62, 91, 93, 
+	95, 98, 99, 101, 105, 114, 118, 119, 
+	123, 124, 125, 9, 13, 49, 57, 65, 
+	90, 97, 122, 61, 42, 47, 88, 120, 
+	48, 55, 48, 55, 48, 57, 65, 70, 
+	97, 102, 48, 57, 61, 61, 61, 95, 
+	48, 57, 65, 90, 97, 122, 95, 114, 
+	48, 57, 65, 90, 97, 122, 95, 101, 
+	48, 57, 65, 90, 97, 122, 95, 97, 
+	48, 57, 65, 90, 98, 122, 95, 107, 
+	48, 57, 65, 90, 97, 122, 95, 111, 
+	48, 57, 65, 90, 97, 122, 95, 110, 
+	48, 57, 65, 90, 97, 122, 95, 115, 
+	116, 48, 57, 65, 90, 97, 122, 95, 
+	116, 48, 57, 65, 90, 97, 122, 95, 
+	105, 48, 57, 65, 90, 97, 122, 95, 
+	110, 48, 57, 65, 90, 97, 122, 95, 
+	117, 48, 57, 65, 90, 97, 122, 95, 
+	101, 48, 57, 65, 90, 97, 122, 95, 
+	108, 48, 57, 65, 90, 97, 122, 95, 
+	115, 48, 57, 65, 90, 97, 122, 95, 
+	101, 48, 57, 65, 90, 97, 122, 95, 
+	102, 110, 48, 57, 65, 90, 97, 122, 
+	95, 116, 48, 57, 65, 90, 97, 122, 
+	95, 101, 48, 57, 65, 90, 97, 122, 
+	95, 116, 48, 57, 65, 90, 97, 122, 
+	95, 117, 48, 57, 65, 90, 97, 122, 
+	95, 114, 48, 57, 65, 90, 97, 122, 
+	95, 110, 48, 57, 65, 90, 97, 122, 
+	95, 111, 48, 57, 65, 90, 97, 122, 
+	95, 105, 48, 57, 65, 90, 97, 122, 
+	95, 100, 48, 57, 65, 90, 97, 122, 
+	95, 104, 48, 57, 65, 90, 97, 122, 
+	95, 105, 48, 57, 65, 90, 97, 122, 
+	95, 108, 48, 57, 65, 90, 97, 122, 
+	95, 101, 48, 57, 65, 90, 97, 122, 
+	0
 };
 
 static const char _rule_single_lengths[] = {
 	0, 1, 2, 3, 1, 0, 1, 31, 
-	1, 2, 1, 2, 0, 0, 0, 1, 
-	1, 1, 1, 2, 2, 2, 2, 2, 
+	1, 2, 2, 0, 0, 0, 1, 1, 
+	1, 1, 2, 2, 2, 2, 2, 2, 
+	3, 2, 2, 2, 2, 2, 2, 2, 
 	2, 3, 2, 2, 2, 2, 2, 2, 
-	2, 2, 3, 2, 2, 2, 2, 2, 
-	2, 2, 2, 2, 2, 2, 2, 2
+	2, 2, 2, 2, 2, 2, 2
 };
 
 static const char _rule_range_lengths[] = {
-	0, 0, 0, 0, 0, 3, 0, 4, 
-	0, 0, 0, 1, 1, 3, 1, 0, 
-	0, 0, 3, 3, 3, 3, 3, 3, 
+	0, 0, 1, 1, 1, 3, 0, 4, 
+	0, 0, 1, 1, 3, 1, 0, 0, 
+	0, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
 	3, 3, 3, 3, 3, 3, 3, 3, 
-	3, 3, 3, 3, 3, 3, 3, 3
+	3, 3, 3, 3, 3, 3, 3
 };
 
 static const short _rule_index_offsets[] = {
-	0, 0, 2, 5, 9, 11, 15, 17, 
-	53, 55, 58, 60, 64, 66, 70, 72, 
-	74, 76, 78, 83, 89, 95, 101, 107, 
-	113, 119, 126, 132, 138, 144, 150, 156, 
-	162, 168, 174, 181, 187, 193, 199, 205, 
-	211, 217, 223, 229, 235, 241, 247, 253
+	0, 0, 2, 6, 11, 14, 18, 20, 
+	56, 58, 61, 65, 67, 71, 73, 75, 
+	77, 79, 84, 90, 96, 102, 108, 114, 
+	120, 127, 133, 139, 145, 151, 157, 163, 
+	169, 175, 182, 188, 194, 200, 206, 212, 
+	218, 224, 230, 236, 242, 248, 254
 };
 
 static const char _rule_indicies[] = {
-	0, 1, 4, 5, 3, 4, 5, 6, 
-	3, 9, 8, 11, 11, 11, 10, 12, 
-	1, 14, 13, 15, 16, 17, 18, 19, 
-	20, 21, 22, 23, 24, 25, 26, 28, 
-	29, 30, 31, 33, 34, 32, 35, 36, 
-	37, 38, 39, 40, 41, 42, 43, 44, 
-	13, 27, 32, 32, 1, 46, 45, 3, 
-	8, 47, 9, 8, 51, 51, 50, 49, 
-	50, 49, 11, 11, 11, 49, 27, 49, 
-	53, 52, 55, 54, 57, 56, 32, 32, 
-	32, 32, 7, 32, 59, 32, 32, 32, 
-	58, 32, 60, 32, 32, 32, 58, 32, 
-	61, 32, 32, 32, 58, 32, 62, 32, 
-	32, 32, 58, 32, 63, 32, 32, 32, 
-	58, 32, 64, 32, 32, 32, 58, 32, 
-	65, 66, 32, 32, 32, 58, 32, 67, 
-	32, 32, 32, 58, 32, 68, 32, 32, 
-	32, 58, 32, 69, 32, 32, 32, 58, 
-	32, 70, 32, 32, 32, 58, 32, 71, 
-	32, 32, 32, 58, 32, 72, 32, 32, 
-	32, 58, 32, 73, 32, 32, 32, 58, 
-	32, 74, 32, 32, 32, 58, 32, 75, 
-	76, 32, 32, 32, 58, 32, 77, 32, 
-	32, 32, 58, 32, 78, 32, 32, 32, 
-	58, 32, 79, 32, 32, 32, 58, 32, 
-	80, 32, 32, 32, 58, 32, 81, 32, 
-	32, 32, 58, 32, 82, 32, 32, 32, 
-	58, 32, 83, 32, 32, 32, 58, 32, 
-	84, 32, 32, 32, 58, 32, 85, 32, 
-	32, 32, 58, 32, 86, 32, 32, 32, 
-	58, 32, 87, 32, 32, 32, 58, 32, 
-	88, 32, 32, 32, 58, 32, 89, 32, 
-	32, 32, 58, 0
+	0, 1, 3, 5, 4, 2, 3, 5, 
+	6, 4, 2, 7, 8, 2, 10, 10, 
+	10, 9, 11, 1, 13, 12, 14, 15, 
+	16, 17, 18, 19, 20, 21, 22, 23, 
+	24, 25, 27, 28, 29, 30, 32, 33, 
+	31, 34, 35, 36, 37, 38, 39, 40, 
+	41, 42, 43, 12, 26, 31, 31, 1, 
+	45, 44, 4, 8, 46, 49, 49, 48, 
+	47, 48, 47, 10, 10, 10, 47, 26, 
+	47, 51, 50, 53, 52, 55, 54, 31, 
+	31, 31, 31, 56, 31, 58, 31, 31, 
+	31, 57, 31, 59, 31, 31, 31, 57, 
+	31, 60, 31, 31, 31, 57, 31, 61, 
+	31, 31, 31, 57, 31, 62, 31, 31, 
+	31, 57, 31, 63, 31, 31, 31, 57, 
+	31, 64, 65, 31, 31, 31, 57, 31, 
+	66, 31, 31, 31, 57, 31, 67, 31, 
+	31, 31, 57, 31, 68, 31, 31, 31, 
+	57, 31, 69, 31, 31, 31, 57, 31, 
+	70, 31, 31, 31, 57, 31, 71, 31, 
+	31, 31, 57, 31, 72, 31, 31, 31, 
+	57, 31, 73, 31, 31, 31, 57, 31, 
+	74, 75, 31, 31, 31, 57, 31, 76, 
+	31, 31, 31, 57, 31, 77, 31, 31, 
+	31, 57, 31, 78, 31, 31, 31, 57, 
+	31, 79, 31, 31, 31, 57, 31, 80, 
+	31, 31, 31, 57, 31, 81, 31, 31, 
+	31, 57, 31, 82, 31, 31, 31, 57, 
+	31, 83, 31, 31, 31, 57, 31, 84, 
+	31, 31, 31, 57, 31, 85, 31, 31, 
+	31, 57, 31, 86, 31, 31, 31, 57, 
+	31, 87, 31, 31, 31, 57, 31, 88, 
+	31, 31, 31, 57, 0
 };
 
 static const char _rule_trans_targs[] = {
 	7, 0, 7, 2, 2, 3, 7, 7, 
-	4, 10, 7, 13, 7, 7, 7, 8, 
-	7, 1, 7, 7, 7, 7, 7, 7, 
-	7, 9, 11, 14, 7, 15, 16, 17, 
-	18, 7, 7, 19, 23, 31, 34, 36, 
-	41, 44, 7, 6, 7, 7, 7, 7, 
-	7, 7, 12, 5, 7, 7, 7, 7, 
-	7, 7, 7, 20, 21, 22, 18, 24, 
-	25, 26, 27, 18, 28, 29, 30, 18, 
-	32, 33, 18, 18, 35, 18, 37, 38, 
-	39, 40, 18, 42, 43, 18, 45, 46, 
-	47, 18
+	4, 7, 12, 7, 7, 7, 8, 7, 
+	1, 7, 7, 7, 7, 7, 7, 7, 
+	9, 10, 13, 7, 14, 15, 16, 17, 
+	7, 7, 18, 22, 30, 33, 35, 40, 
+	43, 7, 6, 7, 7, 7, 7, 7, 
+	11, 5, 7, 7, 7, 7, 7, 7, 
+	7, 7, 19, 20, 21, 17, 23, 24, 
+	25, 26, 17, 27, 28, 29, 17, 31, 
+	32, 17, 17, 34, 17, 36, 37, 38, 
+	39, 17, 41, 42, 17, 44, 45, 46, 
+	17
 };
 
 static const char _rule_trans_actions[] = {
-	49, 0, 69, 0, 1, 0, 13, 73, 
-	0, 108, 71, 0, 51, 11, 9, 0, 
-	39, 0, 19, 21, 37, 33, 27, 35, 
-	29, 75, 7, 0, 31, 0, 0, 0, 
-	105, 15, 17, 0, 0, 0, 0, 0, 
-	0, 0, 23, 0, 25, 63, 47, 57, 
-	53, 65, 0, 0, 61, 43, 55, 45, 
-	59, 41, 67, 0, 0, 0, 87, 0, 
-	0, 0, 0, 96, 0, 0, 0, 90, 
-	0, 0, 81, 78, 0, 99, 0, 0, 
-	0, 0, 93, 0, 0, 102, 0, 0, 
-	0, 84
+	49, 0, 67, 1, 0, 0, 13, 73, 
+	0, 69, 0, 51, 11, 9, 0, 39, 
+	0, 19, 21, 37, 33, 27, 35, 29, 
+	7, 7, 0, 31, 0, 0, 0, 103, 
+	15, 17, 0, 0, 0, 0, 0, 0, 
+	0, 23, 0, 25, 61, 47, 55, 63, 
+	0, 0, 59, 43, 53, 45, 57, 41, 
+	71, 65, 0, 0, 0, 85, 0, 0, 
+	0, 0, 94, 0, 0, 0, 88, 0, 
+	0, 79, 76, 0, 97, 0, 0, 0, 
+	0, 91, 0, 0, 100, 0, 0, 0, 
+	82
 };
 
 static const char _rule_to_state_actions[] = {
@@ -190,7 +190,7 @@ static const char _rule_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0
 };
 
 static const char _rule_from_state_actions[] = {
@@ -199,16 +199,16 @@ static const char _rule_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0
 };
 
 static const short _rule_eof_trans[] = {
-	0, 0, 3, 3, 8, 11, 0, 0, 
-	46, 48, 49, 50, 50, 50, 50, 53, 
-	55, 57, 8, 59, 59, 59, 59, 59, 
-	59, 59, 59, 59, 59, 59, 59, 59, 
-	59, 59, 59, 59, 59, 59, 59, 59, 
-	59, 59, 59, 59, 59, 59, 59, 59
+	0, 0, 3, 3, 3, 10, 0, 0, 
+	45, 47, 48, 48, 48, 48, 51, 53, 
+	55, 57, 58, 58, 58, 58, 58, 58, 
+	58, 58, 58, 58, 58, 58, 58, 58, 
+	58, 58, 58, 58, 58, 58, 58, 58, 
+	58, 58, 58, 58, 58, 58, 58
 };
 
 static const int rule_start = 7;
@@ -337,189 +337,178 @@ _eof_trans:
 	{te = p+1;}
 	break;
 	case 4:
-#line 23 "/home/etaoin/wtsyc/lexer.rl"
-	{act = 4;}
-	break;
-	case 5:
-#line 38 "/home/etaoin/wtsyc/lexer.rl"
-	{act = 18;}
-	break;
-	case 6:
 #line 49 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 29;}
 	break;
-	case 7:
+	case 5:
 #line 50 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 30;}
 	break;
-	case 8:
+	case 6:
 #line 51 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 31;}
 	break;
-	case 9:
+	case 7:
 #line 52 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 32;}
 	break;
-	case 10:
+	case 8:
 #line 53 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 33;}
 	break;
-	case 11:
+	case 9:
 #line 54 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 34;}
 	break;
-	case 12:
+	case 10:
 #line 55 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 35;}
 	break;
-	case 13:
+	case 11:
 #line 56 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 36;}
 	break;
-	case 14:
+	case 12:
 #line 57 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 37;}
 	break;
-	case 15:
+	case 13:
 #line 63 "/home/etaoin/wtsyc/lexer.rl"
 	{act = 39;}
 	break;
-	case 16:
+	case 14:
 #line 16 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{
     line_end(p);
   }}
 	break;
-	case 17:
+	case 15:
 #line 21 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;}
 	break;
-	case 18:
+	case 16:
 #line 22 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;}
 	break;
-	case 19:
+	case 17:
+#line 23 "/home/etaoin/wtsyc/lexer.rl"
+	{te = p+1;}
+	break;
+	case 18:
 #line 25 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_LBRACKET(tokenRange()); }}
 	break;
-	case 20:
+	case 19:
 #line 26 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_RBRACKET(tokenRange()); }}
 	break;
-	case 21:
+	case 20:
 #line 27 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_LPAREN(tokenRange()); }}
 	break;
-	case 22:
+	case 21:
 #line 28 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_RPAREN(tokenRange()); }}
 	break;
-	case 23:
+	case 22:
 #line 29 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_LCURLY(tokenRange()); }}
 	break;
-	case 24:
+	case 23:
 #line 30 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_RCURLY(tokenRange()); }}
 	break;
-	case 25:
+	case 24:
 #line 31 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_COMMA(tokenRange()); }}
 	break;
-	case 26:
+	case 25:
 #line 32 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_PERIOD(tokenRange()); }}
 	break;
-	case 27:
+	case 26:
 #line 33 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_SEMICOLON(tokenRange()); }}
 	break;
-	case 28:
+	case 27:
 #line 35 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_PLUS(tokenRange()); }}
 	break;
-	case 29:
+	case 28:
 #line 36 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_MINUS(tokenRange()); }}
 	break;
-	case 30:
+	case 29:
 #line 37 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_STAR(tokenRange()); }}
 	break;
-	case 31:
+	case 30:
 #line 39 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_MOD(tokenRange()); }}
 	break;
-	case 32:
+	case 31:
 #line 41 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_GE(tokenRange()); }}
 	break;
-	case 33:
+	case 32:
 #line 43 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_LE(tokenRange()); }}
 	break;
-	case 34:
+	case 33:
 #line 44 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_EQ(tokenRange()); }}
 	break;
-	case 35:
+	case 34:
 #line 45 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_NEQ(tokenRange()); }}
 	break;
-	case 36:
+	case 35:
 #line 47 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_LOGICAL_AND(tokenRange()); }}
 	break;
-	case 37:
+	case 36:
 #line 48 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p+1;{ return SysY::Parser::make_LOGICAL_OR(tokenRange()); }}
 	break;
-	case 38:
-#line 23 "/home/etaoin/wtsyc/lexer.rl"
-	{te = p;p--;}
-	break;
-	case 39:
+	case 37:
 #line 34 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return SysY::Parser::make_ASSIGN(tokenRange()); }}
 	break;
-	case 40:
+	case 38:
 #line 38 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return SysY::Parser::make_SLASH(tokenRange()); }}
 	break;
-	case 41:
+	case 39:
 #line 40 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return SysY::Parser::make_GT(tokenRange()); }}
 	break;
-	case 42:
+	case 40:
 #line 42 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return SysY::Parser::make_LT(tokenRange()); }}
 	break;
-	case 43:
+	case 41:
 #line 46 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return SysY::Parser::make_LOGICAL_NOT(tokenRange()); }}
 	break;
-	case 44:
+	case 42:
 #line 60 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return make_INT_LITERAL(std::string(ts, te - ts), tokenRange()); }}
 	break;
-	case 45:
+	case 43:
 #line 63 "/home/etaoin/wtsyc/lexer.rl"
 	{te = p;p--;{ return SysY::Parser::make_IDENT(std::string(ts, te - ts), tokenRange()); }}
 	break;
-	case 46:
+	case 44:
 #line 38 "/home/etaoin/wtsyc/lexer.rl"
 	{{p = ((te))-1;}{ return SysY::Parser::make_SLASH(tokenRange()); }}
 	break;
-	case 47:
+	case 45:
 #line 60 "/home/etaoin/wtsyc/lexer.rl"
 	{{p = ((te))-1;}{ return make_INT_LITERAL(std::string(ts, te - ts), tokenRange()); }}
 	break;
-	case 48:
+	case 46:
 #line 1 "NONE"
 	{	switch( act ) {
-	case 18:
-	{{p = ((te))-1;} return SysY::Parser::make_SLASH(tokenRange()); }
-	break;
 	case 29:
 	{{p = ((te))-1;} return SysY::Parser::make_IF(tokenRange()); }
 	break;
@@ -550,13 +539,10 @@ _eof_trans:
 	case 39:
 	{{p = ((te))-1;} return SysY::Parser::make_IDENT(std::string(ts, te - ts), tokenRange()); }
 	break;
-	default:
-	{{p = ((te))-1;}}
-	break;
 	}
 	}
 	break;
-#line 560 "/home/etaoin/wtsyc/lexer.cpp"
+#line 546 "/home/etaoin/wtsyc/lexer.cpp"
 		}
 	}
 
@@ -569,7 +555,7 @@ _again:
 #line 1 "NONE"
 	{ts = 0;}
 	break;
-#line 573 "/home/etaoin/wtsyc/lexer.cpp"
+#line 559 "/home/etaoin/wtsyc/lexer.cpp"
 		}
 	}
 

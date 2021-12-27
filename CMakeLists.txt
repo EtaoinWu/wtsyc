@@ -39,11 +39,11 @@ FILE(GLOB FMT_HDR RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/*.h)
 
 find_library(LIBSYSY sysy 3rd-party/sysy-runtime)
 
-# add_custom_command(
-#     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
-#     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl
-#     COMMAND ragel ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl -o ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp || echo "ragel not found"
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl
+    COMMAND ragel ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl -o ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp || echo "ragel not found"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(compiler
     ${CPP_SRC}
