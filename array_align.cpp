@@ -13,8 +13,9 @@ namespace SysY::ArrayAlign {
     }
   }
 
-  Result _array_align(const AST::pointer<AST::ArrayLiteral> &exp,
-                           const SemanticType &type, int j) {
+  Result _array_align(
+    const AST::pointer<AST::ArrayLiteral> &exp, const SemanticType &type,
+    int j) {
     int current = 0;
     Result alignment = {};
     for (const auto &item : exp->data) {
@@ -31,15 +32,38 @@ namespace SysY::ArrayAlign {
         current++;
       } else {
         throw Exception::BadAST(
-            fmt::format("bad array alignment {}", item->toJSON().dump()));
+          fmt::format("bad array alignment {}", item->toJSON().dump()));
       }
     }
     return alignment;
   }
 
   // Perform the array initialzation process.
-  Result array_align(const AST::pointer<AST::ArrayLiteral> &exp,
-                          const SemanticType &type) {
+  Result array_align(
+    const AST::pointer<AST::ArrayLiteral> &exp, const SemanticType &type) {
     return _array_align(exp, type, 0);
+  }
+
+  // Perform the array initialzation process, and zero-expand them.
+  Result array_align_expand(
+    const AST::pointer<AST::ArrayLiteral> &exp, const SemanticType &type) {
+    auto result = _array_align(exp, type, 0);
+    auto size = type.length();
+    auto expanded = Result{};
+    expanded.reserve(size);
+    auto it = result.begin();
+    auto zero = std::make_shared<AST::LiteralExpression>(0);
+    for (int i = 0; i < size; i++) {
+      if (it != result.end() && it->offset == i) {
+        expanded.push_back(*it);
+        it++;
+      } else {
+        expanded.push_back(Alignment{i, zero});
+      }
+    }
+    while (it != result.end()) {
+      expanded.push_back(*it);
+    }
+    return expanded;
   }
 } // namespace SysY::ArrayAlign
