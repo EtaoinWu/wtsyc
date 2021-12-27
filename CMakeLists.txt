@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(what_the_sysy_compiler LANGUAGES CXX VERSION "0.0.1")
 
-set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
-include(cotire)
+# set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
+# include(cotire)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -65,7 +65,7 @@ target_link_libraries(compiler PRIVATE fpp ${LIBSYSY})
 
 target_link_libraries(compiler PRIVATE nlohmann_json::nlohmann_json)
 
-set_target_properties(compiler PROPERTIES
-        COTIRE_PREFIX_HEADER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/3rd-party/json")
+# set_target_properties(compiler PROPERTIES
+#         COTIRE_PREFIX_HEADER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/3rd-party/json")
 
-cotire(compiler)
+# cotire(compiler)
