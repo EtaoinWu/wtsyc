@@ -248,7 +248,7 @@ namespace SysY::Pass {
         auto prim =
           std::dynamic_pointer_cast<AST::PrimitiveFunction>(function)) {
         // Primitive "macro expansion"
-        int lineno = env->lexer->toPosition(prim->range.begin).line;
+        int lineno = env->lexer->toPosition(call->range.begin).line;
         code.push_back(Eeyore::Param{lineno});
         code.push_back(Eeyore::CallV{sysy_macro_prefix + call->func->name});
         return expr_type{

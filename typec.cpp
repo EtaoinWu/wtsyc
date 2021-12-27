@@ -175,7 +175,7 @@ namespace SysY {
           auto ptr =
             std::dynamic_pointer_cast<AST::ArrayLiteral>(dec->init_value);
           if (ptr != nullptr) {
-            dec->aligned_init = ArrayAlign::array_align(ptr, dec->type.value());
+            dec->aligned_init = ArrayAlign::array_align_expand(ptr, dec->type.value());
           }
         }
 
