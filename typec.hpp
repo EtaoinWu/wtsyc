@@ -7,6 +7,8 @@
 #include <variant>
 
 namespace SysY {
+  class Lexer;
+
   namespace AST {
     template <typename T> using pointer = std::shared_ptr<T>;
     class Node;
@@ -43,10 +45,15 @@ namespace SysY {
       using symbolinfo_t = LowLevelSymbolInfo;
       using symbol_map_t = Utility::levelmap<std::string, symbolinfo_t>;
 
+      const Lexer *lexer;
+
       rc_ptr<symbol_map_t> symbols = std::make_shared<symbol_map_t>();
       rc_ptr<int> variable_count = std::make_shared<int>(0);
       rc_ptr<int> temp_count = std::make_shared<int>(0);
       rc_ptr<int> label_count = std::make_shared<int>(0);
+
+      explicit Environment(const Lexer *lexer_) : lexer{lexer_} {}
+      Environment(const Environment &) = default;
 
       environment_t clone() const {
         auto x = std::make_shared<Environment>(*this);
@@ -64,9 +71,7 @@ namespace SysY {
         }
       }
 
-      int new_label() {
-        return (*label_count)++;
-      }
+      int new_label() { return (*label_count)++; }
     }; // namespace Pass
 
     void verify(const AST::pointer<AST::CompUnit> &cu);

@@ -1,8 +1,7 @@
 #include "parser_wrapper.hpp"
 
 namespace SysY {
-  std::shared_ptr<AST::CompUnit> parse(std::string_view source, bool trace) {
-    Driver driver(source);
+  std::shared_ptr<AST::CompUnit> parse(Driver &driver, bool trace) {
     Parser parser(driver);
 
     if (trace) {
@@ -13,10 +12,6 @@ namespace SysY {
 
     if (error != 0) {
       return nullptr;
-    }
-
-    for (auto x : driver.lexer.lines) {
-      std::cout << x << std::endl;
     }
 
     return std::move(driver.unit);

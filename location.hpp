@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <fmt/core.h>
 #include <iostream>
 #include <string_view>
 
@@ -10,9 +9,7 @@ namespace SysY {
   struct Position {
     ptrdiff_t line;
     ptrdiff_t character;
-    std::string toString() const {
-      return fmt::format("{}:{}", line, character);
-    }
+    std::string toString() const;
   };
 
   // range in a file, 0-indexed characters, clopen interval
@@ -24,9 +21,7 @@ namespace SysY {
     bool exists() const {
       return begin != invalid_offset && end != invalid_offset;
     }
-    std::string toString() const {
-      return fmt::format("Range(begin={},end={})", begin, end);
-    }
+    std::string toString() const;
   };
 
   struct Location {

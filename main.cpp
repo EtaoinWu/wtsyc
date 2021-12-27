@@ -1,12 +1,50 @@
+#include "error.hpp"
 #include "gen_eeyore.hpp"
 #include "parser_wrapper.hpp"
 #include "semantics.hpp"
-#include "error.hpp"
 #include <argparse.hpp>
 #include <fstream>
 #include <gc/gc_cpp.h>
 #include <iostream>
 #include <sstream>
+
+namespace SysY {
+  Pass::environment_t new_primitive_env(const Lexer *lexer) {
+    std::string primitive_declaration = R"(
+      int getint() {}
+      int getch() {}
+      int getarray(int a[]) {}
+      void putint(int a) {}
+      void putch(int a) {}
+      void putarray(int a, int b[]) {}
+      void _sysy_starttime(int a) {}
+      void _sysy_stoptime(int a) {}
+    )";
+
+    Driver driver(primitive_declaration);
+    auto primitive_unit = parse(driver, false);
+    auto env = std::make_shared<Pass::Environment>(&driver.lexer);
+    Pass::typecheck(primitive_unit, env);
+    env->lexer = lexer;
+
+    for (auto prim : {
+           std::make_shared<AST::PrimitiveFunction>(
+             PrimitiveType::VOID, "starttime"),
+           std::make_shared<AST::PrimitiveFunction>(
+             PrimitiveType::VOID, "stoptime"),
+         }) {
+      auto cat = Pass::LowLevelSymbolInfo::category_of(prim.get());
+      env->symbols->insert(
+        prim->name, Pass::LowLevelSymbolInfo{
+                      cat,
+                      env->get_count(cat),
+                      -1,
+                      prim,
+                    });
+    }
+    return env;
+  }
+} // namespace SysY
 
 int main(int argc, char **argv) {
   GC_INIT();
@@ -46,14 +84,14 @@ int main(int argc, char **argv) {
   std::ifstream ifile(ifilename);
   std::stringstream ibuf;
   ibuf << ifile.rdbuf();
-  auto res = parse(ibuf.str(), program.get<bool>("--trace"));
-  
-  DEBUG_LOG(res->toJSON().dump(2));
+  std::string source = ibuf.str();
+  Driver driver(source);
+  auto res = parse(driver, program.get<bool>("--trace"));
 
   // passes
   try {
     Pass::verify(res);
-    Pass::typecheck(res, nullptr);
+    Pass::typecheck(res, new_primitive_env(&driver.lexer));
     if (program.get<bool>("--output-eeyore")) {
       auto eeyore = Pass::generate_eeyore(res);
       auto program = output_program(eeyore);

@@ -198,6 +198,17 @@ namespace SysY {
           {"stmt", "while"}, {"while", cond->toJSON()}, {"do", body->toJSON()}};
     }
 
+    std::string PrimitiveFunction::toString() const {
+      return fmt::format("PrimitiveFunction {} {} ({})", SysY::toString(ret),
+                         name, fmt::join(params, ", "));
+    }
+
+    json PrimitiveFunction::toJSON() const {
+      return {{"return", SysY::toString(ret)},
+              {"name", name},
+              {"params", AST::toJSON(params)}};
+    }
+
     std::string Function::toString() const {
       return fmt::format("Function {} {} ({}) {{{}}}", SysY::toString(ret),
                          name, fmt::join(params, ", "), code->toString());

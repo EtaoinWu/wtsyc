@@ -14,9 +14,20 @@ namespace SysY {
 
   namespace Pass {
     using namespace mpark::patterns;
+
+    struct EvalPureResult {
+      int data;
+    };
+    struct EvalOffsetResult {
+      rc_ptr<AST::ConstDeclaration> data;
+      int pos;
+      int offset;
+    };
+    using eval_t = std::variant<EvalPureResult, EvalOffsetResult>;
+
     LowLevelSymbolInfo::Category
     LowLevelSymbolInfo::category_of(const AST::Node *node) {
-      if (dynamic_cast<const AST::Function *>(node) != nullptr) {
+      if (dynamic_cast<const AST::Callable *>(node) != nullptr) {
         return function;
       } else if (dynamic_cast<const AST::ParamDeclaration *>(node) != nullptr) {
         return parameter;
@@ -51,16 +62,6 @@ namespace SysY {
         throw Exception::VerificationError("main() does not exist");
       }
     }
-
-    struct EvalPureResult {
-      int data;
-    };
-    struct EvalOffsetResult {
-      rc_ptr<AST::ConstDeclaration> data;
-      int pos;
-      int offset;
-    };
-    using eval_t = std::variant<EvalPureResult, EvalOffsetResult>;
 
     eval_t k_eval(AST::pointer<AST::Expression> exp, environment_t env);
 
@@ -227,7 +228,6 @@ namespace SysY {
         typecheck(stmt_while->body, env);
 
       } else if (const auto cu = std::dynamic_pointer_cast<AST::CompUnit>(x)) {
-        env = std::make_shared<Environment>();
         cu->env = env;
         for (const auto &dec : cu->globals) {
           typecheck(dec, env);

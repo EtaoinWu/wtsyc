@@ -3,6 +3,6 @@
 #include "parser.hpp"
 
 namespace SysY {
-  std::shared_ptr<AST::CompUnit> parse(std::string_view source,
+  std::shared_ptr<AST::CompUnit> parse(Driver &driver,
                                        bool trace = false);
 }

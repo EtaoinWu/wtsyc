@@ -1,11 +1,14 @@
 #include "gen_eeyore.hpp"
 #include "error.hpp"
+#include "lexer.hpp"
 #include "util.hpp"
 #include <fmt/core.h>
 #include <iterator>
 #include <utility>
 
 namespace SysY::Pass {
+  const std::string sysy_macro_prefix = "_sysy_";
+
   using f_code = std::vector<Eeyore::Statement>;
   using f_symtab = std::vector<LowLevelSymbolInfo>;
   using f_dec = std::vector<Eeyore::DeclarationX>;
@@ -199,9 +202,34 @@ namespace SysY::Pass {
       for (auto temp_param : temp_params) {
         code.push_back(Eeyore::Param{temp_param});
       }
-      auto ret = new_temp(env);
-      code.push_back(Eeyore::CallI{ret, call->func->name});
-      return expr_type{code, ret, SemanticType::scalar};
+      auto function = std::dynamic_pointer_cast<AST::Callable>(
+        env->symbols->at(call->func->name).ptr);
+      assert(function != nullptr);
+      if (
+        auto prim =
+          std::dynamic_pointer_cast<AST::PrimitiveFunction>(function)) {
+        // Primitive "macro expansion"
+        int lineno = env->lexer->toPosition(prim->range.begin).line;
+        code.push_back(Eeyore::Param{lineno});
+        code.push_back(Eeyore::CallV{sysy_macro_prefix + call->func->name});
+        return expr_type{
+          code,
+          Eeyore::VariableI{Eeyore::VCategory::temp, -1},
+          SemanticType::scalar,
+        };
+      } else if (function->ret == PrimitiveType::INT) {
+        auto ret = new_temp(env);
+        code.push_back(Eeyore::CallI{ret, call->func->name});
+        return expr_type{code, ret, SemanticType::scalar};
+      } else {
+        code.push_back(Eeyore::CallV{call->func->name});
+        return expr_type{
+          code,
+          Eeyore::VariableI{Eeyore::VCategory::temp, -1},
+          SemanticType::scalar,
+        };
+      }
+
     } else {
       throw Exception::BadAST(
         fmt::format("control reached the end of {}()", __func__));
@@ -281,11 +309,18 @@ namespace SysY::Pass {
       if (ret->rhs.has_value()) {
         auto exp = ret->rhs.value();
         auto [code, result, _] = generate_expr(exp, env);
-        return stmt_result{code, {}};
+        return stmt_result{
+          concat(
+            code,
+            f_code{
+              Eeyore::RetI{result},
+            }),
+          {},
+        };
       } else {
         return stmt_result{
           {
-            Eeyore::RetI{0},
+            Eeyore::RetV{},
           },
           {},
         };
@@ -393,6 +428,12 @@ namespace SysY::Pass {
               dec.emplace_back(DeclarationS{var});
             }
           },
+          [&dec](CallI exp) {
+            auto var = std::get<Eeyore::VariableI>(exp.ret);
+            if (var.cat == VCategory::temp) {
+              dec.emplace_back(DeclarationS{var});
+            }
+          },
           [](auto exp) {}},
         stmt);
     }
@@ -410,6 +451,8 @@ namespace SysY::Pass {
       result.global.emplace_back(declaration_cast(sym));
       initializer_code.insert(initializer_code.end(), code.begin(), code.end());
     }
+
+    initializer_code.push_back(RetV{});
 
     result.func.emplace_back(
       pretty_function("__initializer__SysY", 0, {}, initializer_code));

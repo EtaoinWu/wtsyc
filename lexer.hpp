@@ -35,5 +35,6 @@ namespace SysY {
     Parser::symbol_type exec();
     Parser::symbol_type operator()();
     Position toPosition(ptrdiff_t d) const;
+    std::string report_range(Range r) const;
   };
 } // namespace SysY

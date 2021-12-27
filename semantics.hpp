@@ -2,6 +2,7 @@
 
 #include "primitive.hpp"
 #include "typec.hpp"
+#include "location.hpp"
 #include <json/json.hpp>
 #include <optional>
 #include <string>
@@ -53,14 +54,16 @@ namespace SysY {
 
     template <typename T> json toJSON(const container<T> &c) {
       std::vector<json> c_json;
-      std::transform(c.begin(), c.end(), std::back_inserter(c_json),
-                     [](const T &exp) { return exp->toJSON(); });
+      std::transform(
+        c.begin(), c.end(), std::back_inserter(c_json),
+        [](const T &exp) { return exp->toJSON(); });
       return c_json;
     }
 
     using literal_type = int;
     class Node {
     public:
+      Range range;
       virtual std::string toString() const = 0;
       virtual json toJSON() const = 0;
       virtual ~Node() = default;
@@ -111,8 +114,8 @@ namespace SysY {
         BinaryOp op;
         pointer<Expression> ch0;
         pointer<Expression> ch1;
-        BinaryExpression(BinaryOp op_, pointer<Expression> ch0_,
-                         pointer<Expression> ch1_)
+        BinaryExpression(
+          BinaryOp op_, pointer<Expression> ch0_, pointer<Expression> ch1_)
             : op{op_}, ch0{std::move(ch0_)}, ch1{std::move(ch1_)} {}
 
         std::string toString() const override;
@@ -124,8 +127,8 @@ namespace SysY {
       public:
         pointer<LeftValueExpression> arr;
         pointer<Expression> offset;
-        OffsetExpression(pointer<LeftValueExpression> arr_,
-                         pointer<Expression> offset_)
+        OffsetExpression(
+          pointer<LeftValueExpression> arr_, pointer<Expression> offset_)
             : arr{std::move(arr_)}, offset{std::move(offset_)} {}
 
         std::string toString() const override;
@@ -181,8 +184,8 @@ namespace SysY {
         ArrayAlign::Result aligned_init;
         pointer<PotentialLiteral> init_value;
         Declaration(Declaration &&) = default;
-        Declaration(const std::string &name_,
-                    pointer<PotentialLiteral> init_value_)
+        Declaration(
+          const std::string &name_, pointer<PotentialLiteral> init_value_)
             : name(name_), type(std::nullopt), aligned_init(),
               init_value(std::move(init_value_)) {}
         bool is_scalar() const { return type.value().is_scalar(); }
@@ -194,9 +197,9 @@ namespace SysY {
       public:
         using Declaration::Declaration;
         OffsetList offset_list;
-        CompileTimeDeclaration(const std::string &name_,
-                               OffsetList offset_list_,
-                               pointer<PotentialLiteral> init_value_)
+        CompileTimeDeclaration(
+          const std::string &name_, OffsetList offset_list_,
+          pointer<PotentialLiteral> init_value_)
             : Declaration(name_, std::move(init_value_)),
               offset_list(std::move(offset_list_)) {}
         CompileTimeDeclaration(CompileTimeDeclaration &&) = default;
@@ -259,8 +262,8 @@ namespace SysY {
         pointer<LeftValueExpression> lhs;
         pointer<Expression> rhs;
 
-        AssignmentStmt(pointer<LeftValueExpression> lhs_,
-                       pointer<Expression> rhs_)
+        AssignmentStmt(
+          pointer<LeftValueExpression> lhs_, pointer<Expression> rhs_)
             : lhs{std::move(lhs_)}, rhs{std::move(rhs_)} {}
 
         std::string toString() const override;
@@ -294,8 +297,9 @@ namespace SysY {
         pointer<Statement> then_clause;
         std::optional<pointer<Statement>> else_clause;
 
-        IfStmt(pointer<Expression> cond_, pointer<Statement> then_clause_,
-               pointer<Statement> else_clause_)
+        IfStmt(
+          pointer<Expression> cond_, pointer<Statement> then_clause_,
+          pointer<Statement> else_clause_)
             : cond{move(cond_)}, then_clause{move(then_clause_)},
               else_clause{move(else_clause_)} {}
 
@@ -323,24 +327,37 @@ namespace SysY {
     } // namespace Statements
     using namespace Statements;
 
-    class Function : public Node {
+    class Callable : public Node {
     public:
       PrimitiveType ret;
       std::string name;
       container<pointer<ParamDeclaration>> params;
+      Callable(
+        PrimitiveType ret_, const std::string &name_, decltype(params) params_ = {})
+          : ret{ret_}, name{name_}, params{std::move(params_)} {}
+    };
+
+    class PrimitiveFunction : public Callable {
+      using Callable::Callable;
+
+      std::string toString() const override;
+      json toJSON() const override;
+    };
+
+    class Function : public Callable {
+    public:
       pointer<Block> code;
       Pass::environment_t env = nullptr;
 
-      Function(PrimitiveType ret_, const std::string &name_,
-               decltype(params) params_, decltype(code) code_)
-          : ret{ret_}, name{name_}, params{std::move(params_)}, code{move(
-                                                                    code_)} {}
-      Function(PrimitiveType ret_, const std::string &name_,
-               decltype(code) code_)
-          : ret{ret_}, name{name_}, params{}, code{move(code_)} {}
+      Function(
+        PrimitiveType ret_, const std::string &name_, decltype(params) params_,
+        decltype(code) code_)
+          : Callable(ret_, name_, std::move(params_)), code{move(code_)} {}
+      Function(
+        PrimitiveType ret_, const std::string &name_, decltype(code) code_)
+          : Callable(ret_, name_, {}), code{move(code_)} {}
 
       std::string toString() const override;
-
       json toJSON() const override;
     };
 
@@ -350,7 +367,6 @@ namespace SysY {
       container<pointer<Function>> functions;
       Pass::environment_t env = nullptr;
       std::string toString() const override;
-
       json toJSON() const override;
     };
 
