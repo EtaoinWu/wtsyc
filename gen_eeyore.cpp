@@ -4,6 +4,7 @@
 #include "util.hpp"
 #include <fmt/core.h>
 #include <iterator>
+#include <unordered_set>
 #include <utility>
 
 namespace SysY::Pass {
@@ -151,9 +152,47 @@ namespace SysY::Pass {
       assert(_0.is_scalar());
       assert(_1.is_scalar());
       auto temp = new_temp(env);
-      auto code = concat(code_ch0, code_ch1);
-      code.push_back(Eeyore::ExprB{temp, binary->op, result_ch0, result_ch1});
-      return expr_type{code, temp, SemanticType::scalar};
+      if (binary->op == BinaryOp::And) {
+        auto mid = Eeyore::LabelE{env->new_label()};
+        auto end = Eeyore::LabelE{env->new_label()};
+        return expr_type{
+          concat(
+            code_ch0,
+            f_code{
+              Eeyore::JumpC{mid, result_ch0},
+            },
+            code_ch1,
+            f_code{
+              Eeyore::ExprC{temp, result_ch1},
+              Eeyore::JumpU{end},
+              mid,
+              Eeyore::ExprC{temp, 0},
+              end,
+            }),
+          temp, SemanticType::scalar};
+      } else if (binary->op == BinaryOp::Or) {
+        auto mid = Eeyore::LabelE{env->new_label()};
+        auto end = Eeyore::LabelE{env->new_label()};
+        return expr_type{
+          concat(
+            code_ch0,
+            f_code{
+              Eeyore::JumpC{mid, result_ch0},
+              Eeyore::ExprC{temp, 1},
+              Eeyore::JumpU{end},
+              mid,
+            },
+            code_ch1,
+            f_code{
+              Eeyore::ExprC{temp, result_ch1},
+              end,
+            }),
+          temp, SemanticType::scalar};
+      } else {
+        auto code = concat(code_ch0, code_ch1);
+        code.push_back(Eeyore::ExprB{temp, binary->op, result_ch0, result_ch1});
+        return expr_type{code, temp, SemanticType::scalar};
+      }
 
     } else if (
       auto offset = std::dynamic_pointer_cast<AST::OffsetExpression>(exp)) {
@@ -399,43 +438,40 @@ namespace SysY::Pass {
   Eeyore::Function
   pretty_function(std::string_view name, int arity, f_dec dec, f_code code) {
     using namespace Eeyore;
+    std::unordered_set<int> uniq;
     f_code vcode;
     for (auto const &stmt : code) {
       vcode.push_back(stmt);
-      std::visit(
+
+      auto dst = std::visit(
         overloaded{
-          [&dec](ExprU exp) {
-            auto var = std::get<Eeyore::VariableI>(exp.dst);
-            if (var.cat == VCategory::temp) {
-              dec.emplace_back(DeclarationS{var});
-            }
+          [](ExprU exp) -> std::optional<SysY::Eeyore::VariableX> {
+            return exp.dst;
           },
-          [&dec](ExprB exp) {
-            auto var = std::get<Eeyore::VariableI>(exp.dst);
-            if (var.cat == VCategory::temp) {
-              dec.emplace_back(DeclarationS{var});
-            }
+          [](ExprB exp) -> std::optional<SysY::Eeyore::VariableX> {
+            return exp.dst;
           },
-          [&dec](ExprC exp) {
-            auto var = std::get<Eeyore::VariableI>(exp.dst);
-            if (var.cat == VCategory::temp) {
-              dec.emplace_back(DeclarationS{var});
-            }
+          [](ExprC exp) -> std::optional<SysY::Eeyore::VariableX> {
+            return exp.dst;
           },
-          [&dec](ExprAR exp) {
-            auto var = std::get<Eeyore::VariableI>(exp.dst);
-            if (var.cat == VCategory::temp) {
-              dec.emplace_back(DeclarationS{var});
-            }
+          [](ExprAR exp) -> std::optional<SysY::Eeyore::VariableX> {
+            return exp.dst;
           },
-          [&dec](CallI exp) {
-            auto var = std::get<Eeyore::VariableI>(exp.ret);
-            if (var.cat == VCategory::temp) {
-              dec.emplace_back(DeclarationS{var});
-            }
+          [](CallI exp) -> std::optional<SysY::Eeyore::VariableX> {
+            return exp.ret;
           },
-          [](auto exp) {}},
+          [](auto exp) -> std::optional<SysY::Eeyore::VariableX> {
+            return std::nullopt;
+          }},
         stmt);
+      if (dst.has_value()) {
+        auto var = std::get<Eeyore::VariableI>(dst.value());
+        if (var.cat == VCategory::temp) {
+          if (uniq.insert(var.id).second) {
+            dec.emplace_back(DeclarationS{var});
+          }
+        }
+      }
     }
     return Function{std::string(name), arity, dec, vcode};
   }

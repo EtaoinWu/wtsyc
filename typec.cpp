@@ -108,11 +108,21 @@ namespace SysY {
         return EvalPureResult{toOP(x->op)(ch)};
       } else if (
         auto x = std::dynamic_pointer_cast<AST::BinaryExpression>(exp)) {
-        AST::literal_type ch0 =
-          std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
-        AST::literal_type ch1 =
-          std::get<EvalPureResult>(k_eval(x->ch1, env)).data;
-        return EvalPureResult{toOP(x->op)(ch0, ch1)};
+        if (x->op == BinaryOp::And) {
+          AST::literal_type ch0 =
+            std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
+          return EvalPureResult{ch0 && std::get<EvalPureResult>(k_eval(x->ch1, env)).data};
+        } else if (x->op == BinaryOp::Or) {
+          AST::literal_type ch0 =
+            std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
+          return EvalPureResult{ch0 || std::get<EvalPureResult>(k_eval(x->ch1, env)).data};
+        } else {
+          AST::literal_type ch0 =
+            std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
+          AST::literal_type ch1 =
+            std::get<EvalPureResult>(k_eval(x->ch1, env)).data;
+          return EvalPureResult{toOP(x->op)(ch0, ch1)};
+        }
       } else if (
         auto x = std::dynamic_pointer_cast<AST::OffsetExpression>(exp)) {
         AST::literal_type offset =
