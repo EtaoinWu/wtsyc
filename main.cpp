@@ -93,6 +93,10 @@ int main(int argc, char **argv) {
   Driver driver(source);
   auto res = parse(driver, program.get<bool>("--trace"));
 
+  if (program.get<bool>("--trace")) {
+    DEBUG_LOG("\n" + res->toJSON().dump());
+  }
+
   // passes
   try {
     Pass::verify(res);

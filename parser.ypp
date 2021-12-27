@@ -204,7 +204,7 @@ statement:
    | "if" "(" or_expr ")" statement { $$ = std::make_shared<AST::IfStmt>(move($3), move($5)); $$->range = @$; }
    | "while" "(" or_expr ")" statement { $$ = std::make_shared<AST::WhileStmt>(move($3), move($5)); $$->range = @$; }
    | "break" ";" { $$ = std::make_shared<AST::BreakStmt>(); $$->range = @$; }
-   | "continue" ";" { $$ = std::make_shared<AST::BreakStmt>(); $$->range = @$; }
+   | "continue" ";" { $$ = std::make_shared<AST::ContinueStmt>(); $$->range = @$; }
    | "return" ";" { $$ = std::make_shared<AST::ReturnStmt>(); $$->range = @$; }
    | "return" expr ";" { $$ = std::make_shared<AST::ReturnStmt>(move($2)); $$->range = @$; }
 
