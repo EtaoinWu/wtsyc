@@ -35,20 +35,20 @@ FILE(GLOB FMT_HDR RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/*.h)
 
 find_library(LIBSYSY sysy 3rd-party/sysy-runtime)
 
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl
-    COMMAND ragel ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl -o ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp || echo "ragel not found"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+# add_custom_command(
+#     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
+#     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl
+#     COMMAND ragel ${CMAKE_CURRENT_SOURCE_DIR}/lexer.rl -o ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp || echo "ragel not found"
+#     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(wtsyc
+add_executable(compiler
     ${CPP_SRC}
     ${FMT_CPP_SRC}
     ${BISON_parser_OUTPUTS}
     ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
 )
 
-target_include_directories(wtsyc
+target_include_directories(compiler
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
@@ -57,9 +57,9 @@ target_include_directories(wtsyc
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/fpp/gc/include
 )
 
-target_link_libraries(wtsyc fpp ${LIBSYSY})
+target_link_libraries(compiler fpp ${LIBSYSY})
 
-set_target_properties(wtsyc PROPERTIES
+set_target_properties(compiler PROPERTIES
         COTIRE_PREFIX_HEADER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/3rd-party/json")
 
-cotire(wtsyc)
+cotire(compiler)
