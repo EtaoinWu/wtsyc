@@ -9,6 +9,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rd-party/fpp)
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+set(JSON_Install OFF CACHE INTERNAL "")
+add_subdirectory(${CMAKE_SOURCE_DIR}/3rd-party/json)
+
 add_compile_options(-Wall -Wno-register)
 
 # Make ninja happy with color outputs
@@ -57,7 +61,9 @@ target_include_directories(compiler
         ${CMAKE_CURRENT_SOURCE_DIR}/3rd-party/fpp/gc/include
 )
 
-target_link_libraries(compiler fpp ${LIBSYSY})
+target_link_libraries(compiler PRIVATE fpp ${LIBSYSY})
+
+target_link_libraries(compiler PRIVATE nlohmann_json::nlohmann_json)
 
 set_target_properties(compiler PROPERTIES
         COTIRE_PREFIX_HEADER_INCLUDE_PATH "${CMAKE_SOURCE_DIR}/3rd-party/json")

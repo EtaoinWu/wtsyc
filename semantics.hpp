@@ -3,7 +3,7 @@
 #include "primitive.hpp"
 #include "typec.hpp"
 #include "location.hpp"
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 #include <type_traits>

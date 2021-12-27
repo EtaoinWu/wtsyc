@@ -2,7 +2,7 @@
 #include "levelmap.hpp"
 #include <fpp/fmap.h>
 #include <fpp/fstring.h>
-#include <json/json.hpp>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <variant>
 
