@@ -29,6 +29,8 @@ namespace SysY {
         return dimensions.front() * offsets.front();
       }
     }
+
+    static const SemanticType scalar; // == SemanticType{{}}
   };
 
   namespace AST {

@@ -27,7 +27,7 @@ namespace SysY {
 
       // For eeyore
       int count;
-      
+
       // length == 0: scalar
       int length;
       rc_ptr<AST::Node> ptr;
@@ -46,6 +46,7 @@ namespace SysY {
       rc_ptr<symbol_map_t> symbols = std::make_shared<symbol_map_t>();
       rc_ptr<int> variable_count = std::make_shared<int>(0);
       rc_ptr<int> temp_count = std::make_shared<int>(0);
+      rc_ptr<int> label_count = std::make_shared<int>(0);
 
       environment_t clone() const {
         auto x = std::make_shared<Environment>(*this);
@@ -56,11 +57,17 @@ namespace SysY {
       int get_count(LowLevelSymbolInfo::Category cat) {
         if (cat == LowLevelSymbolInfo::variable) {
           return (*variable_count)++;
+        } else if (cat == LowLevelSymbolInfo::temporary) {
+          return (*temp_count)++;
         } else {
           return 0;
         }
       }
-    };
+
+      int new_label() {
+        return (*label_count)++;
+      }
+    }; // namespace Pass
 
     void verify(const AST::pointer<AST::CompUnit> &cu);
     void typecheck(const AST::pointer<AST::Node> &x, environment_t env);

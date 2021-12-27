@@ -70,7 +70,7 @@ namespace SysY::Eeyore {
                   return fmt::format("goto l{}", p.tgt.id);
                 },
                 [](const JumpC &p) {
-                  return fmt::format("if {} != 0 goto l{}", varName(p.cnd),
+                  return fmt::format("if {} == 0 goto l{}", varName(p.cnd),
                                      p.tgt.id);
                 },
                 [](const Param &p) {

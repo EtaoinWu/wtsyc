@@ -4,3 +4,6 @@ build*/
 wtsyc
 *.lex.cpp
 *.parse.cpp
+
+MiniVM/
+test/*

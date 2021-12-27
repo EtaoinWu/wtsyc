@@ -3,6 +3,8 @@
 #include <fmt/format.h>
 
 namespace SysY {
+  const SemanticType SemanticType::scalar = SemanticType{{}};
+
   SemanticType::SemanticType(const std::vector<literal_type> &dimensions_)
       : dimensions(dimensions_) {
     calculate_offsets();
