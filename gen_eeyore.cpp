@@ -291,7 +291,10 @@ namespace SysY::Pass {
     rc_ptr<AST::Statement> stmt, environment_t env,
     std::optional<Eeyore::Label> cont_pos,
     std::optional<Eeyore::Label> break_pos) {
-    if (auto brk = std::dynamic_pointer_cast<AST::BreakStmt>(stmt)) {
+    if (auto nop = std::dynamic_pointer_cast<AST::EmptyStmt>(stmt)) {
+      return stmt_result{{}, {}};
+
+    } else if (auto brk = std::dynamic_pointer_cast<AST::BreakStmt>(stmt)) {
       return stmt_result{f_code{Eeyore::JumpU{break_pos.value()}}, {}};
 
     } else if (auto cont = std::dynamic_pointer_cast<AST::ContinueStmt>(stmt)) {

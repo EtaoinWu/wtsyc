@@ -234,6 +234,13 @@ namespace SysY {
     namespace Statements {
       class Statement : public BlockItem {};
 
+      class EmptyStmt : public Statement{
+      public:
+        EmptyStmt() = default;
+        std::string toString() const override;
+        json toJSON() const override;
+      };
+
       class BreakStmt : public Statement {
       public:
         BreakStmt() = default;

@@ -130,6 +130,10 @@ namespace SysY {
           {"type", "call"}, {"func", func->toJSON()}, {"args", args.toJSON()}};
     }
 
+    std::string EmptyStmt::toString() const { return "nop"; }
+
+    json EmptyStmt::toJSON() const { return "nop"; }
+
     std::string BreakStmt::toString() const { return "break"; }
 
     json BreakStmt::toJSON() const { return "break"; }

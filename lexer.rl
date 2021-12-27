@@ -19,7 +19,7 @@ using namespace std;
   main := |*
     "\n"    => line_count;
     space;
-    "/*" ( print | "\n" @line_count )* :>> "*/";
+    "/*" ( "\n" @line_count | any )* :>> "*/";
     "//" (any *) :>> "\n" @line_count;
     
     "["         => { return SysY::Parser::make_LBRACKET(tokenRange()); };
@@ -73,8 +73,8 @@ namespace SysY {
   Parser::symbol_type make_INT_LITERAL(const std::string &val, Range r) {
     errno = 0;
     long n = strtol (val.c_str(), NULL, 0);
-    if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
-      throw Parser::syntax_error(r, "integer is out of range: " + val);
+    // if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
+    //   throw Parser::syntax_error(r, "integer is out of range: " + val);
     return Parser::make_INT_LITERAL(static_cast<int>(n), r);
   }
 
