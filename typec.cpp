@@ -1,5 +1,6 @@
 #include "typec.hpp"
 #include "array_align.hpp"
+#include "dynamic_ast.hpp"
 #include "error.hpp"
 #include "levelmap.hpp"
 #include "primitive.hpp"
@@ -111,11 +112,13 @@ namespace SysY {
         if (x->op == BinaryOp::And) {
           AST::literal_type ch0 =
             std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
-          return EvalPureResult{ch0 && std::get<EvalPureResult>(k_eval(x->ch1, env)).data};
+          return EvalPureResult{
+            ch0 && std::get<EvalPureResult>(k_eval(x->ch1, env)).data};
         } else if (x->op == BinaryOp::Or) {
           AST::literal_type ch0 =
             std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
-          return EvalPureResult{ch0 || std::get<EvalPureResult>(k_eval(x->ch1, env)).data};
+          return EvalPureResult{
+            ch0 || std::get<EvalPureResult>(k_eval(x->ch1, env)).data};
         } else {
           AST::literal_type ch0 =
             std::get<EvalPureResult>(k_eval(x->ch0, env)).data;
@@ -158,6 +161,42 @@ namespace SysY {
       return dimensions;
     }
 
+    AST::pointer<AST::Expression>
+    disambiguate(const AST::pointer<AST::Expression> &exp, environment_t env) {
+      if (auto x = std::dynamic_pointer_cast<AST::Identifier>(exp)) {
+        auto z =
+          std::make_shared<AST::Symbol>(x->name, env->symbols->at(x->name));
+        z->range = x->range;
+        return z;
+      } else if (
+        auto x = std::dynamic_pointer_cast<AST::UnaryExpression>(exp)) {
+        x->ch = disambiguate(x->ch, env);
+        return x;
+      } else if (
+        auto x = std::dynamic_pointer_cast<AST::BinaryExpression>(exp)) {
+        x->ch0 = disambiguate(x->ch0, env);
+        x->ch1 = disambiguate(x->ch1, env);
+        return x;
+      } else if (
+        auto x = std::dynamic_pointer_cast<AST::OffsetExpression>(exp)) {
+        x->arr = std::dynamic_pointer_cast<AST::LeftValueExpression>(
+          disambiguate(x->arr, env));
+        assert(x->arr != nullptr);
+        x->offset = disambiguate(x->offset, env);
+        return x;
+      } else if (auto x = std::dynamic_pointer_cast<AST::CallExpression>(exp)) {
+        x->func = std::dynamic_pointer_cast<AST::Identifier>(
+          disambiguate(x->func, env));
+        assert(x->func != nullptr);
+        for (auto &param : x->args.params) {
+          param = disambiguate(param, env);
+        }
+        return x;
+      } else {
+        return exp;
+      }
+    }
+
     void typecheck(const AST::pointer<AST::Node> &x, environment_t env) {
       if (
         const auto dec =
@@ -175,8 +214,13 @@ namespace SysY {
           auto ptr =
             std::dynamic_pointer_cast<AST::ArrayLiteral>(dec->init_value);
           if (ptr != nullptr) {
-            dec->aligned_init = ArrayAlign::array_align_expand(ptr, dec->type.value());
+            dec->aligned_init =
+              ArrayAlign::array_align_expand(ptr, dec->type.value());
           }
+        }
+
+        for (auto &alignment : dec->aligned_init) {
+          alignment.exp = disambiguate(alignment.exp, env);
         }
 
         if (auto kdec = std::dynamic_pointer_cast<AST::ConstDeclaration>(dec)) {
@@ -227,7 +271,27 @@ namespace SysY {
         }
 
       } else if (
+        const auto assign = std::dynamic_pointer_cast<AST::AssignmentStmt>(x)) {
+        assign->lhs = std::dynamic_pointer_cast<AST::LeftValueExpression>(
+          disambiguate(assign->lhs, env));
+        assert(assign->lhs);
+        assign->rhs = disambiguate(assign->rhs, env);
+
+      } else if (
+        const auto expr_stmt =
+          std::dynamic_pointer_cast<AST::ExpressionStmt>(x)) {
+        expr_stmt->rhs = disambiguate(expr_stmt->rhs, env);
+
+      } else if (
+        const auto return_stmt =
+          std::dynamic_pointer_cast<AST::ReturnStmt>(x)) {
+        if (return_stmt->rhs.has_value()) {
+          return_stmt->rhs = disambiguate(return_stmt->rhs.value(), env);
+        }
+
+      } else if (
         const auto stmt_if = std::dynamic_pointer_cast<AST::IfStmt>(x)) {
+        stmt_if->cond = disambiguate(stmt_if->cond, env);
         typecheck(stmt_if->then_clause, env);
         if (stmt_if->else_clause.has_value()) {
           typecheck(stmt_if->else_clause.value(), env);
@@ -235,6 +299,7 @@ namespace SysY {
 
       } else if (
         const auto stmt_while = std::dynamic_pointer_cast<AST::WhileStmt>(x)) {
+        stmt_while->cond = disambiguate(stmt_while->cond, env);
         typecheck(stmt_while->body, env);
 
       } else if (const auto cu = std::dynamic_pointer_cast<AST::CompUnit>(x)) {
@@ -251,7 +316,6 @@ namespace SysY {
                        });
         }
         for (const auto &func : cu->functions) {
-          typecheck(func, env);
           auto cat = LowLevelSymbolInfo::category_of(func.get());
           env->symbols->insert(
             func->name, LowLevelSymbolInfo{
@@ -260,6 +324,7 @@ namespace SysY {
                           -1,
                           func,
                         });
+          typecheck(func, env);
         }
       }
     }

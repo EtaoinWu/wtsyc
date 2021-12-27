@@ -136,15 +136,15 @@ namespace SysY {
         json toJSON() const override;
       };
 
-      class FuncParams : public Node {
+      class CallParams : public Node {
       public:
         container<pointer<Expression>> params;
-        FuncParams(container<pointer<Expression>> params_)
+        CallParams(container<pointer<Expression>> params_)
             : params{std::move(params_)} {}
-        FuncParams() = default;
-        FuncParams(const FuncParams &) = delete;
-        FuncParams(FuncParams &&) = default;
-        FuncParams &operator=(const FuncParams &) = delete;
+        CallParams() = default;
+        CallParams(const CallParams &) = delete;
+        CallParams(CallParams &&) = default;
+        CallParams &operator=(const CallParams &) = delete;
         std::string toString() const override;
         json toJSON() const override;
       };
@@ -152,8 +152,8 @@ namespace SysY {
       class CallExpression : public Expression {
       public:
         pointer<Identifier> func;
-        FuncParams args;
-        CallExpression(pointer<Identifier> func_, FuncParams args_)
+        CallParams args;
+        CallExpression(pointer<Identifier> func_, CallParams args_)
             : func{std::move(func_)}, args{std::move(args_)} {}
 
         std::string toString() const override;

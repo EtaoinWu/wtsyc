@@ -1,4 +1,5 @@
 #include "gen_eeyore.hpp"
+#include "dynamic_ast.hpp"
 #include "error.hpp"
 #include "lexer.hpp"
 #include "util.hpp"
@@ -122,7 +123,13 @@ namespace SysY::Pass {
   }
 
   expr_type generate_expr(rc_ptr<AST::Expression> exp, environment_t env) {
-    if (auto id = std::dynamic_pointer_cast<AST::Identifier>(exp)) {
+    if (auto symb = std::dynamic_pointer_cast<AST::Symbol>(exp)) {
+      auto info = symb->info;
+      auto dec =
+        std::dynamic_pointer_cast<AST::CompileTimeDeclaration>(info.ptr);
+      return expr_type{{}, symbol_ref(info), dec->type.value()};
+
+    } else if (auto id = std::dynamic_pointer_cast<AST::Identifier>(exp)) {
       auto info = env->symbols->at(id->name);
       auto dec =
         std::dynamic_pointer_cast<AST::CompileTimeDeclaration>(info.ptr);
@@ -241,8 +248,13 @@ namespace SysY::Pass {
       for (auto temp_param : temp_params) {
         code.push_back(Eeyore::Param{temp_param});
       }
-      auto function = std::dynamic_pointer_cast<AST::Callable>(
-        env->symbols->at(call->func->name).ptr);
+      rc_ptr<AST::Callable> function = nullptr;
+      if (auto func_symb = std::dynamic_pointer_cast<AST::Symbol>(call->func)) {
+        function = std::dynamic_pointer_cast<AST::Callable>(func_symb->info.ptr);
+      } else {
+        function = std::dynamic_pointer_cast<AST::Callable>(
+          env->symbols->at(call->func->name).ptr);
+      }
       assert(function != nullptr);
       if (
         auto prim =
@@ -311,7 +323,13 @@ namespace SysY::Pass {
       f_code code = rhs_code;
       auto lval = assign->lhs;
       f_code snippet;
-      if (auto var_lval = std::dynamic_pointer_cast<AST::Identifier>(lval)) {
+      if (auto symb_lval = std::dynamic_pointer_cast<AST::Symbol>(lval)) {
+        // scalar assign
+        auto [_code, var, _] = generate_expr(symb_lval, env);
+        assert(_.is_scalar());
+        snippet = {Eeyore::ExprC{var, rhs_temp}};
+      } else if (
+        auto var_lval = std::dynamic_pointer_cast<AST::Identifier>(lval)) {
         // scalar assign
         auto [_code, var, _] = generate_expr(var_lval, env);
         assert(_.is_scalar());
