@@ -1,4 +1,5 @@
 #pragma once
+#include <variant>
 
 namespace SysY {
   template <class... Ts> struct overloaded : Ts... { using Ts::operator()...; };

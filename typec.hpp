@@ -1,10 +1,5 @@
 #pragma once
 #include "levelmap.hpp"
-#include <fpp/fmap.h>
-#include <fpp/fstring.h>
-#include <nlohmann/json.hpp>
-#include <optional>
-#include <variant>
 
 namespace SysY {
   class Lexer;

@@ -1,6 +1,6 @@
 %language "c++"
 %require  "3.3"
-%debug 
+/* %debug  */
 %defines 
 
 %define api.namespace {SysY}
