@@ -53,6 +53,11 @@ int main(int argc, char **argv) {
 
   argparse::ArgumentParser program("wtsyc");
 
+  program.add_argument("-S", "--source")
+    .help("Compile from source")
+    .default_value(true)
+    .implicit_value(true);
+
   program.add_argument("-T", "--trace")
     .help("Bison trace")
     .default_value(false)
