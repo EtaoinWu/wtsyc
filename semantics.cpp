@@ -1,4 +1,5 @@
 #include "semantics.hpp"
+#include "dynamic_ast.hpp"
 #include <algorithm>
 #include <fmt/format.h>
 
@@ -70,6 +71,10 @@ namespace SysY {
       return fmt::format("Identifier {}", name);
     }
 
+    std::string Symbol::toString() const {
+      return fmt::format("Symbol {}", name);
+    }
+
     std::string LiteralExpression::toString() const {
       return fmt::format("LiteralExpression ({})", val);
     }
@@ -109,11 +114,11 @@ namespace SysY {
               {"offset", offset->toJSON()}};
     }
 
-    std::string FuncParams::toString() const {
+    std::string CallParams::toString() const {
       return fmt::format("({})", fmt::join(params, ", "));
     }
 
-    json FuncParams::toJSON() const { return AST::toJSON(params); }
+    json CallParams::toJSON() const { return AST::toJSON(params); }
 
     std::string CallExpression::toString() const {
       return fmt::format("CallExpression {} {}", func->toString(),

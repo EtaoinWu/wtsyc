@@ -45,7 +45,7 @@
    <AST::pointer<AST::ArrayLiteral>>
    <AST::pointer<AST::Identifier>>
    <AST::pointer<AST::LeftValueExpression>>
-   <AST::pointer<AST::FuncParams>>
+   <AST::pointer<AST::CallParams>>
    <AST::pointer<AST::OffsetList>>
    <AST::pointer<AST::Block>>
    <AST::pointer<AST::Function>>
@@ -244,7 +244,7 @@ primary_expr:
 %nterm <AST::pointer<AST::Expression>> unary_expr;
 unary_expr:
    primary_expr { $$ = move($1); $$->range = @$; }
-   | identifier "(" ")" { $$ = std::make_shared<AST::CallExpression>(move($1), AST::FuncParams{}); $$->range = @$; }
+   | identifier "(" ")" { $$ = std::make_shared<AST::CallExpression>(move($1), AST::CallParams{}); $$->range = @$; }
    | identifier "(" func_params ")" { $$ = std::make_shared<AST::CallExpression>(move($1), std::move(*($3))); $$->range = @$; }
    | unary_op unary_expr { $$ = std::make_shared<AST::UnaryExpression>($1, move($2)); $$->range = @$; }
 
@@ -295,9 +295,9 @@ unary_op:
 /// Utility ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-%nterm <AST::pointer<AST::FuncParams>> func_params;
+%nterm <AST::pointer<AST::CallParams>> func_params;
 func_params:
-   expr { $$ = std::make_shared<AST::FuncParams>(); $$->params.emplace_back(move($1)); $$->range = @$; }
+   expr { $$ = std::make_shared<AST::CallParams>(); $$->params.emplace_back(move($1)); $$->range = @$; }
    | func_params "," expr { $$ = std::move($1); $$->params.emplace_back(move($3)); $$->range = @$; }
 
 %nterm <AST::pointer<AST::OffsetList>> offset_list;
