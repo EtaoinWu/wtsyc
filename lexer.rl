@@ -20,7 +20,7 @@ using namespace std;
     "\n"    => line_count;
     space;
     "/*" ( print | "\n" @line_count )* :>> "*/";
-    "//" (print *) "\n" @line_count;
+    "//" (any *) :>> "\n" @line_count;
     
     "["         => { return SysY::Parser::make_LBRACKET(tokenRange()); };
     "]"         => { return SysY::Parser::make_RBRACKET(tokenRange()); };
