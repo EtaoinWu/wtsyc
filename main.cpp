@@ -54,41 +54,41 @@ int main(int argc, char **argv) {
 
   using namespace SysY;
 
-  argparse::ArgumentParser program("wtsyc");
+  argparse::ArgumentParser argparser("wtsyc");
 
-  program.add_argument("-S", "--source")
+  argparser.add_argument("-S", "--source")
     .help("Compile from source")
     .default_value(true)
     .implicit_value(true);
 
-  program.add_argument("-T", "--trace")
+  argparser.add_argument("-T", "--trace")
     .help("Bison trace")
     .default_value(false)
     .implicit_value(true);
 
-  program.add_argument("-e", "--output-eeyore")
+  argparser.add_argument("-e", "--output-eeyore")
     .help("Output Eeyore code")
     .default_value(false)
     .implicit_value(true);
-  program.add_argument("-t", "--output-tigger")
+  argparser.add_argument("-t", "--output-tigger")
     .help("Output Tigger code")
     .default_value(false)
     .implicit_value(true);
 
-  program.add_argument("input").help("Input file name").required();
+  argparser.add_argument("input").help("Input file name").required();
 
-  program.add_argument("-o", "--output").help("Output file name").required();
+  argparser.add_argument("-o", "--output").help("Output file name").required();
 
   try {
-    program.parse_args(argc, argv);
+    argparser.parse_args(argc, argv);
   } catch (const std::runtime_error &err) {
     std::cerr << err.what() << std::endl;
-    std::cerr << program;
+    std::cerr << argparser;
     std::exit(1);
   }
-  auto ifilename = program.get("input");
-  auto ofilename = program.get("-o");
-  auto trace = program.get<bool>("--trace");
+  auto ifilename = argparser.get("input");
+  auto ofilename = argparser.get("-o");
+  auto trace = argparser.get<bool>("--trace");
 
   std::ifstream ifile(ifilename);
   std::stringstream ibuf;
@@ -105,13 +105,13 @@ int main(int argc, char **argv) {
   try {
     Pass::verify(res);
     Pass::typecheck(res, new_primitive_env(&driver.lexer));
-    if (program.get<bool>("--output-eeyore")) {
-      auto eeyore = Pass::generate_eeyore(res);
-      if (trace) {
-        DEBUG_LOG("\n" + output_program(eeyore));
-      }
-      auto pinkie = Pinkie::from_eeyore(eeyore);
-      pinkie = Pinkie::Pass::optimize(pinkie);
+    auto eeyore = Pass::generate_eeyore(res);
+    if (trace) {
+      DEBUG_LOG("\n" + output_program(eeyore));
+    }
+    auto pinkie = Pinkie::from_eeyore(eeyore);
+    pinkie = Pinkie::Pass::optimize(pinkie);
+    if (argparser.get<bool>("--output-eeyore")) {
       auto eeyore2 = Pinkie::to_eeyore(pinkie);
       auto program = output_program(eeyore2);
       std::ofstream ofs(ofilename);
