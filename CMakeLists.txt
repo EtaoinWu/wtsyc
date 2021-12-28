@@ -38,7 +38,7 @@ FILE(GLOB FMT_CPP_SRC RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/src/*.cc)
 
 FILE(GLOB FMT_HDR RELATIVE ${CMAKE_SOURCE_DIR} 3rd-party/fmt/*.h)
 
-find_library(LIBSYSY sysy 3rd-party/sysy-runtime)
+# find_library(LIBSYSY sysy 3rd-party/sysy-runtime)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/lexer.cpp
