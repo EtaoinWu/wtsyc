@@ -24,4 +24,19 @@ namespace SysY {
   constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
     return static_cast<typename std::underlying_type<E>::type>(e);
   }
+
+  template<typename T>
+  struct PointerRange {
+    T *_begin, *_end;
+    T *begin() const {
+      return _begin;
+    }
+    T *end() const {
+      return _end;
+    }
+  };
+  template<typename T>
+  PointerRange(T*, T*) -> PointerRange<T>;
+  template<typename T>
+  PointerRange(std::initializer_list<T*>) -> PointerRange<T>;
 } // namespace SysY

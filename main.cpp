@@ -1,6 +1,7 @@
 #include "error.hpp"
 #include "gen_eeyore.hpp"
 #include "interop.hpp"
+#include "optimize.hpp"
 #include "parser_wrapper.hpp"
 #include "semantics.hpp"
 #include <argparse.hpp>
@@ -87,15 +88,16 @@ int main(int argc, char **argv) {
   }
   auto ifilename = program.get("input");
   auto ofilename = program.get("-o");
+  auto trace = program.get<bool>("--trace");
 
   std::ifstream ifile(ifilename);
   std::stringstream ibuf;
   ibuf << ifile.rdbuf();
   std::string source = ibuf.str();
   Driver driver(source);
-  auto res = parse(driver, program.get<bool>("--trace"));
+  auto res = parse(driver, trace);
 
-  if (program.get<bool>("--trace")) {
+  if (trace) {
     DEBUG_LOG("\n" + res->toJSON().dump());
   }
 
@@ -105,7 +107,11 @@ int main(int argc, char **argv) {
     Pass::typecheck(res, new_primitive_env(&driver.lexer));
     if (program.get<bool>("--output-eeyore")) {
       auto eeyore = Pass::generate_eeyore(res);
+      if (trace) {
+        DEBUG_LOG("\n" + output_program(eeyore));
+      }
       auto pinkie = Pinkie::from_eeyore(eeyore);
+      pinkie = Pinkie::Pass::optimize(pinkie);
       auto eeyore2 = Pinkie::to_eeyore(pinkie);
       auto program = output_program(eeyore2);
       std::ofstream ofs(ofilename);
