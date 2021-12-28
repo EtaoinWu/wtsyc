@@ -12,6 +12,7 @@ namespace SysY {
     gc_ptr(const gc_ptr &) = default;
     gc_ptr(gc_ptr &&) = default;
     ~gc_ptr() = default;
+    gc_ptr &operator=(const gc_ptr &) = default;
     T *raw() { return _data; }
   };
 

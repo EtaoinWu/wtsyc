@@ -2,6 +2,7 @@
 
 #include "primitive.hpp"
 #include "boxed.hpp"
+#include "util.hpp"
 
 namespace SysY {
   namespace Pinkie {
@@ -59,14 +60,33 @@ namespace SysY {
         Operand incr;
         Operand src2;
       };
+      PointerRange<Operand> ops();
+      PointerRange<Operand const> ops() const;
+      PointerRange<Operand> rops();
+      PointerRange<Operand const> rops() const;
+      PointerRange<Operand> hrops();
+      PointerRange<Operand const> hrops() const;
+      PointerRange<Operand> wops();
+      PointerRange<Operand const> wops() const;
     };
 
 
     struct UnitOpr {
       Unit::Type type;
       void * _;
-      Operand ops[3];
-      static int op_count(Unit::Type t);
+      Operand dst;
+      Operand _ops[2];
+      static int wop_count(Unit::Type t);
+      static int hwop_count(Unit::Type t);
+      static int rop_count(Unit::Type t);
+      PointerRange<Operand> ops();
+      PointerRange<Operand const> ops() const;
+      PointerRange<Operand> rops();
+      PointerRange<Operand const> rops() const;
+      PointerRange<Operand> hrops();
+      PointerRange<Operand const> hrops() const;
+      PointerRange<Operand> wops();
+      PointerRange<Operand const> wops() const;
     };
 
     static_assert(sizeof(UnitOpr) == sizeof(Unit));
