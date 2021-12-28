@@ -4,8 +4,9 @@ project(what_the_sysy_compiler LANGUAGES CXX VERSION "0.0.1")
 # set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMake")
 # include(cotire)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rd-party/fpp)
 

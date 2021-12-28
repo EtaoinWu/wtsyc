@@ -1,10 +1,12 @@
-#include <argparse.hpp>
 #include "error.hpp"
 #include "gen_eeyore.hpp"
+#include "interop.hpp"
 #include "parser_wrapper.hpp"
 #include "semantics.hpp"
+#include <argparse.hpp>
+#include <fpp/fvector.h>
 #include <fstream>
-#include <gc/gc_cpp.h>
+#include <gc/gc.h>
 #include <iostream>
 #include <sstream>
 
@@ -103,7 +105,9 @@ int main(int argc, char **argv) {
     Pass::typecheck(res, new_primitive_env(&driver.lexer));
     if (program.get<bool>("--output-eeyore")) {
       auto eeyore = Pass::generate_eeyore(res);
-      auto program = output_program(eeyore);
+      auto pinkie = Pinkie::from_eeyore(eeyore);
+      auto eeyore2 = Pinkie::to_eeyore(pinkie);
+      auto program = output_program(eeyore2);
       std::ofstream ofs(ofilename);
       ofs << program;
     }
