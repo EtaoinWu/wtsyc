@@ -6,6 +6,31 @@
 namespace SysY {
   namespace Pinkie {
     namespace Pass {
+
+      Pinkie::Prog flip_binop(Pinkie::Prog prog) {
+        for (auto &f : prog.funcs) {
+          for (auto &c : f.code) {
+            if (c.type == c.binary) {
+              switch (c.bop) {
+              case BinaryOp::Plus:
+              case BinaryOp::Mult:
+                if (c.src1.ns == Operand::literal) {
+                  std::swap(c.src1, c.src2);
+                }
+                break;
+              case BinaryOp::Minus:
+                if (c.src2.ns == Operand::literal) {
+                  c.bop = BinaryOp::Plus;
+                  c.src2.id = -c.src2.id;
+                }
+              default:;
+              }
+            }
+          }
+        }
+        return prog;
+      }
+
       Pinkie::Prog clear_temp(Pinkie::Prog prog) {
         int count = 0;
         std::unordered_map<int, int> compress;
@@ -36,6 +61,7 @@ namespace SysY {
         }
         return prog;
       }
+
       std::optional<int> literal_calc(const Unit &u) {
         switch (u.type) {
         case Unit::unary:
@@ -58,6 +84,7 @@ namespace SysY {
           return std::nullopt;
         }
       }
+
       Pinkie::Prog const_fold(Pinkie::Prog prog) {
         for (auto &f : prog.funcs) {
           std::unordered_map<int, int> assign_count;
@@ -100,6 +127,7 @@ namespace SysY {
         }
         return prog;
       }
+
       Pinkie::Prog unused_temp_remove(Pinkie::Prog prog) {
         for (auto &f : prog.funcs) {
           std::unordered_map<int, int> use_count;
@@ -132,6 +160,7 @@ namespace SysY {
         }
         return prog;
       }
+
       Pinkie::Prog
       operator|(const Pinkie::Prog &prog, Pinkie::Prog (*f)(Pinkie::Prog)) {
         return f(prog);
@@ -141,7 +170,7 @@ namespace SysY {
         return f(prog);
       }
       Pinkie::Prog optimize(Pinkie::Prog prog) {
-        return prog | const_fold | unused_temp_remove /* | clear_temp */;
+        return prog | const_fold | unused_temp_remove | clear_temp | flip_binop;
       }
     } // namespace Pass
   }   // namespace Pinkie
