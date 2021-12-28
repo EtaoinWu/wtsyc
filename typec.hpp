@@ -45,6 +45,8 @@ namespace SysY {
       rc_ptr<symbol_map_t> symbols = std::make_shared<symbol_map_t>();
       rc_ptr<int> variable_count = std::make_shared<int>(0);
       rc_ptr<int> temp_count = std::make_shared<int>(0);
+      bool global = false;
+
       rc_ptr<int> label_count = std::make_shared<int>(0);
 
       explicit Environment(const Lexer *lexer_) : lexer{lexer_} {}
@@ -52,6 +54,7 @@ namespace SysY {
 
       environment_t clone() const {
         auto x = std::make_shared<Environment>(*this);
+        x->global = false;
         x->symbols = x->symbols->clone();
         return x;
       }

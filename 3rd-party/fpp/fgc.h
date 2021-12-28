@@ -47,15 +47,15 @@ namespace F
  */
 GC_INLINE void *gc_malloc(size_t _size)
 {
-    return GC_malloc(_size);
+    return GC_MALLOC(_size);
 }
 GC_INLINE void *gc_malloc_atomic(size_t _size)
 {
-    return GC_malloc_atomic(_size);
+    return GC_MALLOC_ATOMIC(_size);
 }
 GC_INLINE void gc_free(void *_ptr)
 {
-    GC_free(_ptr);
+    GC_FREE(_ptr);
 }
 
 }           /* namesLpace F */

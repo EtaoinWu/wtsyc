@@ -214,8 +214,13 @@ namespace SysY {
           auto ptr =
             std::dynamic_pointer_cast<AST::ArrayLiteral>(dec->init_value);
           if (ptr != nullptr) {
-            dec->aligned_init =
-              ArrayAlign::array_align_expand(ptr, dec->type.value());
+            if (env->global) {
+              dec->aligned_init =
+                ArrayAlign::array_align(ptr, dec->type.value());
+            } else {
+              dec->aligned_init =
+                ArrayAlign::array_align_expand(ptr, dec->type.value());
+            }
           }
         }
 
@@ -304,6 +309,7 @@ namespace SysY {
 
       } else if (const auto cu = std::dynamic_pointer_cast<AST::CompUnit>(x)) {
         cu->env = env;
+        env->global = true;
         for (const auto &dec : cu->globals) {
           typecheck(dec, env);
           auto cat = LowLevelSymbolInfo::category_of(dec.get());
