@@ -1,9 +1,11 @@
+// clang-format off
+#include <argparse.hpp>
+// clang-format on
 #include "error.hpp"
 #include "gen_eeyore.hpp"
 #include "interop.hpp"
 #include "parser_wrapper.hpp"
 #include "semantics.hpp"
-#include <argparse.hpp>
 #include <fpp/fvector.h>
 #include <fstream>
 #include <gc/gc.h>
