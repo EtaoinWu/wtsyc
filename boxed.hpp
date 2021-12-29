@@ -14,6 +14,7 @@ namespace SysY {
     ~gc_ptr() = default;
     gc_ptr &operator=(const gc_ptr &) = default;
     T *raw() { return _data; }
+    T const *raw() const { return _data; }
   };
 
   template <typename T, typename... Args> gc_ptr<T> make_gc(Args &&... args) {

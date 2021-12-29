@@ -109,6 +109,7 @@ namespace SysY {
     };
 
     struct Program {
+      int label_count;
       container<DeclarationX> global;
       container<Function> func;
     };

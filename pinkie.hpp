@@ -1,7 +1,7 @@
 #pragma once
 
-#include "primitive.hpp"
 #include "boxed.hpp"
+#include "primitive.hpp"
 #include "util.hpp"
 
 namespace SysY {
@@ -10,6 +10,12 @@ namespace SysY {
       enum Namespace : char { literal = 0, temp = 't', param = 'p', var = 'T' };
       int id;
       Namespace ns;
+      bool operator<(const Operand &rhs) const {
+        return ns < rhs.ns || (ns == rhs.ns && id < rhs.id);
+      }
+      bool operator==(const Operand &rhs) const {
+        return ns == rhs.ns && id == rhs.id;
+      }
     };
 
     inline Operand operand(char c, int id) {
@@ -70,10 +76,9 @@ namespace SysY {
       PointerRange<Operand const> wops() const;
     };
 
-
     struct UnitOpr {
       Unit::Type type;
-      void * _;
+      void *_;
       Operand dst;
       Operand _ops[2];
       static int wop_count(Unit::Type t);
@@ -102,6 +107,7 @@ namespace SysY {
     };
 
     struct Prog {
+      int label_count;
       Decl globals;
       std::vector<Func> funcs;
     };

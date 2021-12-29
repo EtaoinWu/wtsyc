@@ -116,6 +116,11 @@ int main(int argc, char **argv) {
       auto program = output_program(eeyore2);
       std::ofstream ofs(ofilename);
       ofs << program;
+    } else if (argparser.get<bool>("--output-tigger")) {
+      auto dashie = Dashie::compile(pinkie);
+      auto tigger = Dashie::to_tigger(dashie);
+      std::ofstream ofs(ofilename);
+      ofs << tigger;
     }
   } catch (const std::runtime_error &e) {
     std::cerr << typeid(e).name() << ' ' << e.what() << '\n';

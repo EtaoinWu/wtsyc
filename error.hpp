@@ -13,6 +13,10 @@ namespace SysY {
   [[noreturn]] void c_error(
     std::string_view file, std::string_view func, int line,
     std::string_view msg);
+
+  [[noreturn]] void c_assert_fail(
+    std::string_view file, std::string_view func, int line,
+    std::string_view msg);
 } // namespace SysY
 
 #ifdef NDEBUG
@@ -27,6 +31,17 @@ namespace SysY {
   do                                                                           \
     SysY::debug_log(__FILE__, __func__, __LINE__, s);                          \
   while (0)
+#endif
+
+#ifdef NDEBUG
+// We are in release
+#define C_ASSERT(expr) void(0)
+#else
+// We are in debug
+#define C_ASSERT(expr)                                                         \
+  (static_cast<bool>(expr)                                                     \
+     ? void(0)                                                                 \
+     : c_assert_fail(__FILE__, __func__, __LINE__, #expr))
 #endif
 
 #ifdef NDEBUG
