@@ -18,42 +18,6 @@ namespace SysY::Pass {
   using stmt_result = std::tuple<f_code, f_symtab>;
   using dec_result = std::tuple<f_code, LowLevelSymbolInfo>;
 
-  template <typename T>
-  std::vector<T> &merge_into(std::vector<T> &a, const std::vector<T> &b) {
-    a.insert(a.end(), b.begin(), b.end());
-    return a;
-  }
-
-  template <typename T>
-  std::vector<T> &merge_into(std::vector<T> &a, const T &b) {
-    a.push_back(b);
-    return a;
-  }
-
-  struct do_in_order {
-    template <typename T> do_in_order(std::initializer_list<T> &&) {}
-  };
-
-  namespace details {
-    template <typename V> void concat_helper(V &l, const V &r) {
-      l.insert(l.end(), r.begin(), r.end());
-    }
-    template <class V> void concat_helper(V &l, V &&r) {
-      l.insert(
-        l.end(), std::make_move_iterator(r.begin()),
-        std::make_move_iterator(r.end()));
-    }
-  } // namespace details
-
-  template <typename T, typename... A>
-  std::vector<T> concat(std::vector<T> v1, A &&... vr) {
-    std::size_t s = v1.size();
-    do_in_order{s += vr.size()...};
-    v1.reserve(s);
-    do_in_order{(details::concat_helper(v1, std::forward<A>(vr)), 0)...};
-    return std::move(v1); // rvo blocked
-  }
-
   Eeyore::VCategory category_cast(LowLevelSymbolInfo::Category cat) {
     switch (cat) {
     case LowLevelSymbolInfo::temporary:

@@ -26,6 +26,7 @@ namespace SysY {
   std::string toString(PrimitiveType t);
   std::string toString(UnaryOp t);
   std::string toString(BinaryOp t);
+
   std::function<int(int)> toOP(UnaryOp t);
   std::function<int(int, int)> toOP(BinaryOp t);
 } // namespace SysY

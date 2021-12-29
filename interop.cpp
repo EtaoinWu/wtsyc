@@ -166,7 +166,6 @@ namespace SysY {
         auto retv = Reg{RegType::arg, 0};
         auto tmp0 = Reg{RegType::temp, 1};
         auto tmp1 = Reg{RegType::temp, 2};
-        auto tmp2 = Reg{RegType::temp, 0};
 
         int param_c = 0;
 

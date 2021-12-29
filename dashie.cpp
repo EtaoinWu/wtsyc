@@ -11,14 +11,6 @@
 namespace SysY::Dashie {
 #define INDENT "  "
 
-  std::string join(const std::vector<std::string> &strings, const char *delim) {
-    std::ostringstream oss;
-    std::copy(
-      strings.begin(), strings.end(),
-      std::ostream_iterator<std::string>(oss, delim));
-    return oss.str();
-  }
-
   std::string to_tigger(RegType x) { return std::string{char(x)}; }
   std::string to_tigger(Reg x) {
     return fmt::format("{}{}", to_tigger(x.ns), x.id);
