@@ -18,4 +18,11 @@ namespace SysY {
     exit(-1);
 #endif
   }
+  [[noreturn]] void c_assert_fail(
+    std::string_view file, std::string_view func, int line,
+    std::string_view cond) {
+    std::cerr << fmt::format(
+      "[{}:{}] {}(): assertion {} failed\n", file, line, func, cond);
+    exit(-1);
+  }
 } // namespace SysY

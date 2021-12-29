@@ -2,18 +2,9 @@
 #include "eeyore.hpp"
 #include "error.hpp"
 #include "pinkie.hpp"
+#include "dashie.hpp"
 
 namespace SysY {
-  template <typename U, typename T, typename Func>
-  inline std::vector<U> map_to_vector(T &&v, Func &&f) {
-    typename std::vector<U> ans;
-    ans.reserve(end(v) - begin(v));
-    for (const auto &x : v) {
-      ans.push_back(f(x));
-    }
-    return ans;
-  }
-
   namespace Pinkie {
     struct FromEeyore {
       Operand::Namespace operator()(Eeyore::VCategory cat) {
@@ -171,6 +162,7 @@ namespace SysY {
       }
       Prog operator()(const Eeyore::Program &prog) {
         return Prog{
+          .label_count = prog.label_count,
           .globals = (*this)(prog.global),
           .funcs = (*this)(prog.func),
         };
@@ -303,6 +295,7 @@ namespace SysY {
       }
       Eeyore::Program operator()(Prog from) {
         return Eeyore::Program{
+          from.label_count,
           (*this)(from.globals),
           (*this)(from.funcs),
         };
@@ -310,4 +303,7 @@ namespace SysY {
     };
     extern ToEeyore to_eeyore;
   } // namespace Pinkie
+  namespace Dashie {
+    Program compile(const Pinkie::Prog &src);
+  }
 } // namespace SysY

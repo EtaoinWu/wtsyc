@@ -535,6 +535,8 @@ namespace SysY::Pass {
         pretty_function(f->name, f->params.size(), dec, code));
     }
 
+    result.label_count = *(cu->env->label_count);
+
     return result;
   }
 } // namespace SysY::Pass
