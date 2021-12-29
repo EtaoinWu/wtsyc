@@ -1,8 +1,10 @@
 #include "error.hpp"
 #include "gen_eeyore.hpp"
+#include "glimmy.hpp"
 #include "interop.hpp"
 #include "optimize.hpp"
 #include "parser_wrapper.hpp"
+#include "riscv_output.hpp"
 #include "semantics.hpp"
 #include <argparse.hpp>
 #include <fpp/fvector.h>
@@ -116,11 +118,17 @@ int main(int argc, char **argv) {
       auto program = output_program(eeyore2);
       std::ofstream ofs(ofilename);
       ofs << program;
-    } else if (argparser.get<bool>("--output-tigger")) {
+    } else {
       auto dashie = Dashie::compile(pinkie);
-      auto tigger = Dashie::to_tigger(dashie);
-      std::ofstream ofs(ofilename);
-      ofs << tigger;
+      if (argparser.get<bool>("--output-tigger")) {
+        auto tigger = Dashie::to_tigger(dashie);
+        std::ofstream ofs(ofilename);
+        ofs << tigger;
+      } else {
+        auto riscv = Glimmy::to_riscv(dashie);
+        std::ofstream ofs(ofilename);
+        ofs << riscv;
+      }
     }
   } catch (const std::runtime_error &e) {
     std::cerr << typeid(e).name() << ' ' << e.what() << '\n';
