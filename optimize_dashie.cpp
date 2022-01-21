@@ -103,6 +103,80 @@ namespace SysY {
         }
       };
 
+      struct ImmAlias {
+        std::map<Reg, int> alias_of;
+        std::vector<Unit> operator()(Unit u) {
+          switch (u.type) {
+          case Unit::ci:
+            if (alias_of.count(u.dst) && alias_of[u.dst] == u.imm) {
+              return {};
+            }
+            alias_of[u.dst] = u.imm;
+            return {u};
+          case Unit::jc:
+          case Unit::jmp:
+          case Unit::call:
+          case Unit::ret:
+          case Unit::label:
+            alias_of.clear();
+            return {u};
+          case Unit::rbr:
+          case Unit::rbi:
+          case Unit::ur:
+          case Unit::cr:
+          case Unit::ar:
+          case Unit::rstk:
+          case Unit::rglo:
+          case Unit::ptrstk:
+          case Unit::ptrglo:
+            alias_of.erase(u.dst);
+            return {u};
+          case Unit::aw:
+          case Unit::wstk:
+            return {u};
+          default:
+            C_ERROR("bad Dashie Program Unit Type");
+          }
+        }
+      };
+
+      struct GloPtrAlias {
+        std::map<Reg, int> alias_of;
+        std::vector<Unit> operator()(Unit u) {
+          switch (u.type) {
+          case Unit::ptrglo:
+            if (alias_of.count(u.dst) && alias_of[u.dst] == u.global_id) {
+              return {};
+            }
+            alias_of[u.dst] = u.global_id;
+            return {u};
+          case Unit::jc:
+          case Unit::jmp:
+          case Unit::call:
+          case Unit::ret:
+          case Unit::label:
+            alias_of.clear();
+            return {u};
+          case Unit::rbr:
+          case Unit::rbi:
+          case Unit::ur:
+          case Unit::cr:
+          case Unit::ci:
+          case Unit::ar:
+          case Unit::rstk:
+          case Unit::rglo:
+          case Unit::ptrstk:
+            alias_of.erase(u.dst);
+            return {u};
+          case Unit::aw:
+          case Unit::wstk:
+            return {u};
+          default:
+            C_ERROR("bad Dashie Program Unit Type");
+          }
+        }
+      };
+
       struct UnusedStack {
         std::set<int> used_stack;
         UnusedStack(const std::vector<Unit> &code) {
@@ -146,6 +220,7 @@ namespace SysY {
 
       Dashie::Program peephole(Dashie::Program prog) {
         for (auto &func : prog.funcs) {
+          func.code = func.code >> GloPtrAlias{} >> ImmAlias{};
           func.code = func.code >> StkPtrAlias{} >> VarAlias{};
           func.code = func.code >> UnusedStack{func.code};
           func.code = immediate_goto(func.code);
