@@ -108,24 +108,6 @@ namespace SysY {
       return {x};
     }
 
-    template <typename T, typename Func>
-    std::vector<T> operator>>(const std::vector<T> &l, Func f) {
-      std::vector<T> result;
-      for (const auto &item : l) {
-        merge_into(result, f(item));
-      }
-      return result;
-    }
-
-    template <typename T>
-    std::vector<T> monad_join(const std::vector<std::vector<T>> v) {
-      std::vector<T> result;
-      for (const auto &item : v) {
-        merge_into(result, item);
-      }
-      return result;
-    }
-
     std::vector<Unit> convert(const Dashie::Unit &x, int STK) {
       switch (x.type) {
       case Dashie::Unit::rbr: {

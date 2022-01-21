@@ -1,7 +1,7 @@
 #pragma once
-#include <variant>
-#include <sstream>
 #include <iterator>
+#include <sstream>
+#include <variant>
 
 namespace SysY {
   template <typename T>
@@ -14,6 +14,24 @@ namespace SysY {
   std::vector<T> &merge_into(std::vector<T> &a, const T &b) {
     a.push_back(b);
     return a;
+  }
+
+  template <typename T, typename Func>
+  std::vector<T> operator>>(const std::vector<T> &l, Func f) {
+    std::vector<T> result;
+    for (const auto &item : l) {
+      merge_into(result, f(item));
+    }
+    return result;
+  }
+
+  template <typename T>
+  std::vector<T> monad_join(const std::vector<std::vector<T>> v) {
+    std::vector<T> result;
+    for (const auto &item : v) {
+      merge_into(result, item);
+    }
+    return result;
   }
 
   struct do_in_order {
@@ -82,7 +100,8 @@ namespace SysY {
     return ans;
   }
 
-  inline std::string join(const std::vector<std::string> &strings, const char *delim) {
+  inline std::string
+  join(const std::vector<std::string> &strings, const char *delim) {
     std::ostringstream oss;
     std::copy(
       strings.begin(), strings.end(),
