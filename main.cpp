@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
       ofs << program;
     } else {
       auto dashie = Dashie::compile(pinkie);
+      dashie = Dashie::Pass::peephole(dashie);
       if (argparser.get<bool>("--output-tigger")) {
         auto tigger = Dashie::to_tigger(dashie);
         std::ofstream ofs(ofilename);
