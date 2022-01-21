@@ -33,11 +33,23 @@ namespace SysY {
       std::map<Pinkie::Operand, Dashie::Global> g_lookup;
       Program p;
       std::vector<Dashie::AnnotatedFunc> annotated;
+      std::vector<Reg> tempos = {
+        Reg{save, 0}, Reg{temp, 1}, Reg{temp, 2}, Reg{temp, 3},
+        Reg{temp, 4}, Reg{temp, 5}, Reg{temp, 6},
+      };
+      int tempo_cnt = 0;
+
+      Reg next_reg() {
+        tempo_cnt++;
+        if (tempo_cnt >= tempos.size())
+          tempo_cnt = 0;
+        return tempos[tempo_cnt];
+      }
 
       static Reg abi_argument(int i) {
         if (i < 8) {
           return Reg{arg, short(i)};
-        } else if(i < 12) {
+        } else if (i < 12) {
           return Reg{temp, short(i - 8 + 3)};
         } else {
           C_ERROR("bad ABI argument number!");
@@ -144,7 +156,7 @@ namespace SysY {
         };
 
         auto store = [this, &func, &a](Reg reg, Pinkie::Operand opr) -> void {
-          auto t1 = Reg{RegType::temp, 2};
+          auto t1 = next_reg();
           if (g_lookup.count(opr)) {
             const auto &glob = g_lookup.at(opr);
             C_ASSERT(glob.length == 0);
@@ -164,12 +176,12 @@ namespace SysY {
         };
 
         auto retv = Reg{RegType::arg, 0};
-        auto tmp0 = Reg{RegType::temp, 1};
-        auto tmp1 = Reg{RegType::temp, 2};
 
         int param_c = 0;
 
         for (auto &c : func.code) {
+          auto tmp0 = next_reg();
+          auto tmp1 = next_reg();
           switch (c.type) {
           case Pinkie::Unit::unary:
             C_ASSERT(c.src.ns != Pinkie::Operand::literal);
