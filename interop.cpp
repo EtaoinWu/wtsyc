@@ -34,7 +34,7 @@ namespace SysY {
       Program p;
       std::vector<Dashie::AnnotatedFunc> annotated;
       std::vector<Reg> tempos = {
-        Reg{save, 0}, Reg{temp, 1}, Reg{temp, 2}, Reg{temp, 3},
+        Reg{temp, 1}, Reg{temp, 2}, Reg{temp, 3},
         Reg{temp, 4}, Reg{temp, 5}, Reg{temp, 6},
       };
       int tempo_cnt = 0;
@@ -77,9 +77,27 @@ namespace SysY {
           });
       }
 
+      int callee_saved_heuristic(const Pinkie::Func &func) {
+        int n_loc = func.decl.size();
+        int x = (n_loc - 6) * 0.8;
+        if (x < 1)
+          x = 1;
+        if (x > 12)
+          x = 12;
+        return x;
+      }
+
       void
       annotate_variable(Dashie::AnnotatedFunc &a, const Pinkie::Func &func) {
-        a.n_callee_saved = 1;
+        a.n_callee_saved = callee_saved_heuristic(func);
+        tempos = {
+          Reg{temp, 1}, Reg{temp, 2}, Reg{temp, 3},
+          Reg{temp, 4}, Reg{temp, 5}, Reg{temp, 6},
+        };
+        for (int i = 0; i < a.n_callee_saved; i++) {
+          tempos.push_back(Reg{save, short(i)});
+        }
+        tempo_cnt = 0;
         for (auto i = 0; i < func.arity; i++) {
           auto symb = Pinkie::Symb{Pinkie::operand('p', i), 0};
           a.locals.emplace(
