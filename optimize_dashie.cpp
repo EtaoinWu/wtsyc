@@ -2,6 +2,7 @@
 #include "optimize.hpp"
 #include "primitive.hpp"
 #include <map>
+#include <set>
 #include <vector>
 
 namespace SysY {
@@ -101,9 +102,53 @@ namespace SysY {
           }
         }
       };
+
+      struct UnusedStack {
+        std::set<int> used_stack;
+        UnusedStack(const std::vector<Unit> &code) {
+          for (const auto &c : code) {
+            if (c.type == Unit::rstk || c.type == Unit::ptrstk) {
+              used_stack.insert(c.stack_incr);
+            }
+          }
+        }
+        UnusedStack(const UnusedStack &) = default;
+        UnusedStack(UnusedStack &&) = default;
+
+        std::vector<Unit> operator()(Unit u) {
+          switch (u.type) {
+          case Unit::wstk:
+            if (used_stack.count(u.stack_incr) == 0) {
+              return {};
+            } else {
+              return {u};
+            }
+          default:
+            return {u};
+          }
+        }
+      };
+
+      std::vector<Unit> immediate_goto(const std::vector<Unit> &v) {
+        if (v.size() <= 2) return v;
+        std::vector<Unit> ans;
+        for (size_t i = 0; i < v.size() - 1; i++) {
+          auto p = v[i];
+          auto q = v[i+1];
+          if (p.type == Unit::jmp && q.type == Unit::label && p.label_id == q.label_id) {
+            continue;
+          }
+          ans.push_back(p);
+        }
+        ans.push_back(v.back());
+        return ans;
+      }
+
       Dashie::Program peephole(Dashie::Program prog) {
         for (auto &func : prog.funcs) {
           func.code = func.code >> StkPtrAlias{} >> VarAlias{};
+          func.code = func.code >> UnusedStack{func.code};
+          func.code = immediate_goto(func.code);
         }
         return prog;
       }
